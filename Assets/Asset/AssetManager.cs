@@ -241,32 +241,34 @@ public class AssetManager : MonoBehaviour {
 
         tmpLoadTask = GetLoadTask(tmpAssetBundleName);
 
-        if(tmpLoadTask!=null)
+        Action<AssetBundle> tmpLoadAssetBindleFinishAction = delegate (AssetBundle varAssetBundle)
         {
-            tmpLoadTask.mCallback += delegate (AssetBundle varAssetBundle)
+            if (varAssetBundle)
             {
-                if (varAssetBundle)
+                if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
                 {
-                    if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
-                    {
 
-                        LoadedAssetBundle tmpLoadedAssetBundle = new LoadedAssetBundle(mManifest, tmpAssetBundleName, varAssetBundle);
+                    LoadedAssetBundle tmpLoadedAssetBundle = new LoadedAssetBundle(mManifest, tmpAssetBundleName, varAssetBundle);
 
 
-                        mAssetBundleDic.Add(tmpAssetBundleName, tmpLoadedAssetBundle);
-                    }
-
-                    LoadAsset(tmpAssetBundleName, varAssetName, varCallback);
+                    mAssetBundleDic.Add(tmpAssetBundleName, tmpLoadedAssetBundle);
                 }
-                else
+
+                LoadAsset(tmpAssetBundleName, varAssetName, varCallback);
+            }
+            else
+            {
+                if (varCallback != null)
                 {
-                    if (varCallback != null)
-                    {
 
-                        varCallback(null);
-                    }
+                    varCallback(null);
                 }
-            };
+            }
+        };
+
+        if (tmpLoadTask!=null)
+        {
+            tmpLoadTask.mCallback += tmpLoadAssetBindleFinishAction;
 
             return tmpLoadTask;
         }
@@ -290,31 +292,7 @@ public class AssetManager : MonoBehaviour {
 			}
 		}		
 			
-		tmpLoadTask = new LoadTask (varAssetBundleName, (varAssetBundle) => {
-		
-			if(varAssetBundle)
-			{
-                if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
-                {
-
-                    LoadedAssetBundle tmpLoadedAssetBundle = new LoadedAssetBundle(mManifest, tmpAssetBundleName, varAssetBundle);
-
-
-                    mAssetBundleDic.Add(tmpAssetBundleName, tmpLoadedAssetBundle);
-                }
-
-                LoadAsset(tmpAssetBundleName, varAssetName, varCallback);
-		
-			}
-
-			else
-			{
-				if (varCallback != null) {
-
-					varCallback (null);
-				}
-			}
-		});
+		tmpLoadTask = new LoadTask (varAssetBundleName, tmpLoadAssetBindleFinishAction);
 
 		mLoadingAssetQueue.Enqueue (tmpLoadTask);
 

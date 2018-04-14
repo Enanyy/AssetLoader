@@ -54,6 +54,18 @@ public class AssetDemo : MonoBehaviour {
             Destroy(go1);
             AssetManager.getMe().UnLoad("assets/r/ui/ui_root1.prefab");
         }
+        if (Input.GetKeyDown(KeyCode.Keypad3))
+        {
+            AssetManager.getMe().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
+            {
+
+                if (varGo)
+                {
+                    go0 = Instantiate(varGo) as GameObject;
+                }
+            });
+
+        }
     }
 	
 	
