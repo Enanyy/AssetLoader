@@ -109,7 +109,7 @@ public class LoadTaskListener : MonoBehaviour
 
     public static LoadTaskListener Get(GameObject varGo, ILoadTaskReceiver varLoadTaskReceiver, string varAssetBundleName,string varAssetName, Action<UnityEngine.Object> varCallback)
     {
-        LoadTask tmpLoadTask = AssetManager.getMe().Load(varAssetBundleName, varAssetName, varCallback);
+        LoadTask tmpLoadTask = AssetManager.GetSingleton().Load(varAssetBundleName, varAssetName, varCallback);
 
         return Get(varGo, varLoadTaskReceiver, tmpLoadTask);
     }

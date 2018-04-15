@@ -2,21 +2,23 @@
 using System.Collections.Generic;
 
 
-public class LoadedAssetBundle
+public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 {
-	AssetBundleManifest mManifest;
+	
 
     public string mAssetBundleName;
-    public AssetBundle mAssetbundle;
+    public AssetBundle mAssetBundle;
 
   
     public List<LoadedAssetBundle> mDependenceList = new List<LoadedAssetBundle> ();
 
-	public LoadedAssetBundle(AssetBundleManifest varManifest,string varAssetBundleName,AssetBundle varAssetbundle)
+    public LoadedAssetBundle() { }
+
+	public void Init(string varAssetBundleName,AssetBundle varAssetbundle)
 	{
 		mAssetBundleName = varAssetBundleName;
-		mAssetbundle =varAssetbundle;
-		mManifest = varManifest;
+		mAssetBundle =varAssetbundle;
+	
       
 		AddDependence ();
 	}
@@ -27,21 +29,25 @@ public class LoadedAssetBundle
 
 	private void AddDependence()
 	{
-		if (mManifest != null && mAssetbundle != null) {
+		if ( mAssetBundle != null) {
 		
-			string[] tmpDependencesArray = mManifest.GetAllDependencies (mAssetBundleName);
+			string[] tmpDependencesArray = AssetManager.GetSingleton().GetAllDependencies (mAssetBundleName);
 
-			for (int i = 0,max = tmpDependencesArray.Length; i < max; ++i) {
-
-				string tmpDependence = tmpDependencesArray [i].ToLower ();
-
-				LoadedAssetBundle tmpLoadedAssetbundle = AssetManager.getMe ().GetLoadedAssetbundle (tmpDependence);
-
-                if(tmpLoadedAssetbundle!=null && mDependenceList.Contains(tmpLoadedAssetbundle)==false)
+            if (tmpDependencesArray != null)
+            {
+                for (int i = 0, max = tmpDependencesArray.Length; i < max; ++i)
                 {
-                    mDependenceList.Add(tmpLoadedAssetbundle);
+
+                    string tmpDependence = tmpDependencesArray[i].ToLower();
+
+                    LoadedAssetBundle tmpLoadedAssetBundle = AssetManager.GetSingleton().GetLoadedAssetBundle(tmpDependence);
+
+                    if (tmpLoadedAssetBundle != null && mDependenceList.Contains(tmpLoadedAssetBundle) == false)
+                    {
+                        mDependenceList.Add(tmpLoadedAssetBundle);
+                    }
                 }
-			}
+            }
 		}
         Debug.Log(mAssetBundleName + " dependence:" + mDependenceList.Count);
         for (int i = 0, max = mDependenceList.Count; i <max; ++i)
@@ -72,10 +78,11 @@ public class LoadedAssetBundle
 
     public void UnLoad()
 	{
-		if (mAssetbundle != null) {
+        mAssetBundleName = null;
+        if (mAssetBundle != null) {
 			
-			mAssetbundle.Unload (true);
-			mAssetbundle = null;
+			mAssetBundle.Unload (true);
+			mAssetBundle = null;
 		}
         mDependenceList.Clear();
     }

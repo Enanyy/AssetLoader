@@ -9,11 +9,11 @@ public class AssetDemo : MonoBehaviour {
     GameObject go2;
     void Awake()
     {
-        AssetManager.getMe();
+        AssetManager.GetSingleton();
     }
 	// Use this for initialization
 	void Start () {
-        AssetManager.getMe().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) => {
+        AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) => {
 
             if(varGo)
             {
@@ -21,7 +21,7 @@ public class AssetDemo : MonoBehaviour {
             }
         });
 
-        AssetManager.getMe().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
+        AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
         {
 
             if (varGo)
@@ -30,7 +30,7 @@ public class AssetDemo : MonoBehaviour {
             }
         });
 
-        AssetManager.getMe().Load("assets/r/ui/ui_root1.prefab", "assets/r/ui/ui_root1.prefab", (varGo) =>
+        AssetManager.GetSingleton().Load("assets/r/ui/ui_root1.prefab", "assets/r/ui/ui_root1.prefab", (varGo) =>
         {
 
             if (varGo)
@@ -47,16 +47,16 @@ public class AssetDemo : MonoBehaviour {
         {
             Destroy(go0);
             Destroy(go2);
-            AssetManager.getMe().UnLoad("assets/r/ui/ui_root.prefab");
+            AssetManager.GetSingleton().UnLoad("assets/r/ui/ui_root.prefab");
         }
         if (Input.GetKeyDown(KeyCode.Keypad1))
         {
             Destroy(go1);
-            AssetManager.getMe().UnLoad("assets/r/ui/ui_root1.prefab");
+            AssetManager.GetSingleton().UnLoad("assets/r/ui/ui_root1.prefab");
         }
         if (Input.GetKeyDown(KeyCode.Keypad3))
         {
-            AssetManager.getMe().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
+            AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
             {
 
                 if (varGo)
