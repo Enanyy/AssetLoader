@@ -11,6 +11,8 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 
   
     public List<LoadedAssetBundle> mDependenceList = new List<LoadedAssetBundle> ();
+    //场景中实例化出来的
+    public List<AssetReference> mReferenceList = new List<AssetReference>();
 
     public LoadedAssetBundle() { }
 

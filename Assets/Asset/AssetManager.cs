@@ -7,6 +7,7 @@ using System.IO;
 
 public class AssetManager : MonoBehaviour {
 
+    #region GetSingleton
     private static AssetManager mInstance;
     public static AssetManager GetSingleton()
     {
@@ -18,6 +19,8 @@ public class AssetManager : MonoBehaviour {
         }
         return mInstance;
     }
+    #endregion
+
     AssetBundle mManifestAssetBundle;
 	AssetBundleManifest mManifest;
 	Dictionary<string, LoadedAssetBundle> mAssetBundleDic = new Dictionary<string, LoadedAssetBundle>();
@@ -258,18 +261,22 @@ public class AssetManager : MonoBehaviour {
 	private bool LoadAsset(string varAssetBundleName, string varAssetName, System.Action<UnityEngine.Object> varCallback)
 	{
 		UnityEngine.Object tmpObject = null;
-		
-		string tmpAssetBundleName = varAssetBundleName.ToLower ();
 
-		LoadedAssetBundle tmpLoadedAssetBundle = null;
+        if (string.IsNullOrEmpty(varAssetName) == false)
+        {
+            string tmpAssetBundleName = varAssetBundleName.ToLower();
 
-		mAssetBundleDic.TryGetValue (tmpAssetBundleName, out  tmpLoadedAssetBundle);
+            LoadedAssetBundle tmpLoadedAssetBundle = null;
 
-		if (tmpLoadedAssetBundle != null && tmpLoadedAssetBundle.mAssetBundle!=null) {
-		
-			tmpObject = tmpLoadedAssetBundle.mAssetBundle.LoadAsset(varAssetName);
+            mAssetBundleDic.TryGetValue(tmpAssetBundleName, out tmpLoadedAssetBundle);
 
-		}
+            if (tmpLoadedAssetBundle != null && tmpLoadedAssetBundle.mAssetBundle != null)
+            {
+
+                tmpObject = tmpLoadedAssetBundle.mAssetBundle.LoadAsset(varAssetName);
+
+            }
+        }
 
         if (varCallback != null)
         {
@@ -280,10 +287,44 @@ public class AssetManager : MonoBehaviour {
         return tmpObject!=null;
 	}
 
-    public static GameObject Instantiate(string varAssetBundleName, UnityEngine.Object varObject)
+    public  GameObject Instantiate(string varAssetBundleName,string varAssetName, UnityEngine.Object varObject)
     {
+        if(varObject == null)
+        {
+            Debug.LogError("Trying Instantiate object is NULL!");
+            return null;
+        }
         GameObject go = Instantiate(varObject) as GameObject;
+        AssetReference dependence = go.AddComponent<AssetReference>();
+        dependence.SetData(varAssetBundleName, varAssetName);
+
+       
+
         return go;
+    }
+
+    public void Destroy(AssetReference varReference)
+    {
+        if (varReference == null)
+        {
+            return;
+        }
+      
+        LoadedAssetBundle tmpLoadedAssetBundle = GetLoadedAssetBundle(varReference.mAssetBundleName);
+        if (tmpLoadedAssetBundle != null)
+        {
+            for(int i = tmpLoadedAssetBundle.mReferenceList.Count -1; i >=0; --i)
+            {
+                if(tmpLoadedAssetBundle.mReferenceList[i] == null || tmpLoadedAssetBundle.mReferenceList[i] == varReference)
+                {
+                    tmpLoadedAssetBundle.mReferenceList.RemoveAt(i);
+                }
+            }
+            if(tmpLoadedAssetBundle.mReferenceList.Count == 0)
+            {
+                UnLoad(varReference.mAssetBundleName);
+            }
+        }
     }
 
 	public LoadedAssetBundle GetLoadedAssetBundle(string varAssetbundleName)
@@ -297,7 +338,13 @@ public class AssetManager : MonoBehaviour {
 
 	public void LoadScene(string varAssetBundleName,System.Action varCallback)
 	{
-		StartCoroutine (LoadSceneAsync (varAssetBundleName, varCallback));
+        Load(varAssetBundleName, "", (varGo) => {
+
+            if(varCallback!=null)
+            {
+                varCallback();
+            }
+        });
 	}
 
 	IEnumerator LoadSceneAsync(string varAssetBundleName,System.Action varCallback)

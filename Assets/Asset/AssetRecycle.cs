@@ -4,10 +4,11 @@ using System.Collections;
 public class AssetRecycle : MonoBehaviour
 {
 	public string mAssetBundleName;
-
-	public void SetData(string varAssetBundleName)
+    public string mAssetName;
+	public void SetData(string varAssetBundleName, string varAssetName)
 	{
 		mAssetBundleName = varAssetBundleName;
+        mAssetName = varAssetName;
 	}
 
 

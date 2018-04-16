@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AssetDemo : MonoBehaviour {
 
@@ -13,32 +14,30 @@ public class AssetDemo : MonoBehaviour {
     }
 	// Use this for initialization
 	void Start () {
+
+       
+
+
+        
         AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) => {
 
             if(varGo)
             {
-                go0 = Instantiate(varGo) as GameObject;
+                go0 = AssetManager.GetSingleton().Instantiate("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab",varGo) as GameObject;
             }
         });
 
-        AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
-        {
-
-            if (varGo)
-            {
-                go2 = Instantiate(varGo) as GameObject;
-            }
-        });
+       
 
         AssetManager.GetSingleton().Load("assets/r/ui/ui_root1.prefab", "assets/r/ui/ui_root1.prefab", (varGo) =>
         {
 
             if (varGo)
             {
-                go1 = Instantiate(varGo) as GameObject;
+                go1 = AssetManager.GetSingleton().Instantiate("assets/r/ui/ui_root1.prefab", "assets/r/ui/ui_root1.prefab",varGo) as GameObject;
             }
         });
-
+       
     }
 
     void Update()
@@ -46,13 +45,18 @@ public class AssetDemo : MonoBehaviour {
         if(Input.GetKeyDown(KeyCode.Keypad0))
         {
             Destroy(go0);
-            Destroy(go2);
-            AssetManager.GetSingleton().UnLoad("assets/r/ui/ui_root.prefab");
+
+           
         }
         if (Input.GetKeyDown(KeyCode.Keypad1))
         {
             Destroy(go1);
-            AssetManager.GetSingleton().UnLoad("assets/r/ui/ui_root1.prefab");
+           
+        }
+        if (Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            Destroy(go2);
+
         }
         if (Input.GetKeyDown(KeyCode.Keypad3))
         {
@@ -61,10 +65,11 @@ public class AssetDemo : MonoBehaviour {
 
                 if (varGo)
                 {
-                    go0 = Instantiate(varGo) as GameObject;
+                    go0 = AssetManager.GetSingleton().Instantiate("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", varGo) as GameObject;
+
+                    go2 = Instantiate(go0) as GameObject;
                 }
             });
-
         }
     }
 	
