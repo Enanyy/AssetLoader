@@ -15,26 +15,27 @@ public class AssetDemo : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-       
+
+        string plane = "assets/r/Plane.prefab";
 
 
-        
-        AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) => {
+
+        AssetManager.GetSingleton().Load(plane, plane, (varGo) => {
 
             if(varGo)
             {
-                go0 = AssetManager.GetSingleton().Instantiate("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab",varGo) as GameObject;
+                go0 = AssetManager.GetSingleton().Instantiate(plane, plane, varGo) as GameObject;
             }
         });
 
-       
 
-        AssetManager.GetSingleton().Load("assets/r/ui/ui_root1.prefab", "assets/r/ui/ui_root1.prefab", (varGo) =>
+        string cube = "assets/r/Cube.prefab";
+        AssetManager.GetSingleton().Load(cube, cube, (varGo) =>
         {
 
             if (varGo)
             {
-                go1 = AssetManager.GetSingleton().Instantiate("assets/r/ui/ui_root1.prefab", "assets/r/ui/ui_root1.prefab",varGo) as GameObject;
+                go1 = AssetManager.GetSingleton().Instantiate(cube, cube, varGo) as GameObject;
             }
         });
        
@@ -60,12 +61,14 @@ public class AssetDemo : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Keypad3))
         {
-            AssetManager.GetSingleton().Load("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", (varGo) =>
+            string plane = "assets/r/Plane.prefab";
+
+            AssetManager.GetSingleton().Load(plane, plane, (varGo) =>
             {
 
                 if (varGo)
                 {
-                    go0 = AssetManager.GetSingleton().Instantiate("assets/r/ui/ui_root.prefab", "assets/r/ui/ui_root.prefab", varGo) as GameObject;
+                    go0 = AssetManager.GetSingleton().Instantiate(plane, plane, varGo) as GameObject;
 
                     go2 = Instantiate(go0) as GameObject;
                 }
