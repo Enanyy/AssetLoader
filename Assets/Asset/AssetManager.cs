@@ -379,6 +379,10 @@ public class AssetManager : MonoBehaviour {
 
     public void UnLoad(string varAssetBundleName)
 	{
+        if(string.IsNullOrEmpty(varAssetBundleName))
+        {
+            return;
+        }
         Debug.Log("UnLoad:"+ varAssetBundleName);
 
 
@@ -421,12 +425,13 @@ public class AssetManager : MonoBehaviour {
 
 	void OnDestroy()
 	{
-		Dictionary<string,LoadedAssetBundle>.Enumerator it = mAssetBundleDic.GetEnumerator ();
-		while (it.MoveNext ()) {
-			if (it.Current.Value != null) {
-				it.Current.Value.UnLoad();
-			}
-		}
+        string[] tmpAssetBundleArray = new string[mAssetBundleDic.Count];
+        mAssetBundleDic.Keys.CopyTo(tmpAssetBundleArray, 0);
+        for (int i = 0,  max = tmpAssetBundleArray.Length; i <max; ++i)
+        {
+            UnLoad(tmpAssetBundleArray[i]);
+        } 
+		
 
 		mAssetBundleDic.Clear ();
 

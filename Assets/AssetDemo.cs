@@ -41,6 +41,7 @@ public class AssetDemo : MonoBehaviour {
        
     }
 
+    List<GameObject> mList = new List<GameObject>();
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Keypad0))
@@ -56,7 +57,11 @@ public class AssetDemo : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Keypad2))
         {
-            Destroy(go2);
+            if(mList.Count > 0)
+            {
+                Destroy(mList[0]);
+                mList.RemoveAt(0);
+            }
 
         }
         if (Input.GetKeyDown(KeyCode.Keypad3))
@@ -68,10 +73,9 @@ public class AssetDemo : MonoBehaviour {
 
                 if (varGo)
                 {
-                    go0 = AssetManager.GetSingleton().Instantiate(plane, plane, varGo) as GameObject;
+                    GameObject go = AssetManager.GetSingleton().Instantiate(plane, plane, varGo) as GameObject;
 
-                    go2 = Instantiate(go0) as GameObject;
-                    go2.transform.position = go0.transform.position + new Vector3(5, 0, 0);
+                    mList.Add(go);
                 }
             });
         }
