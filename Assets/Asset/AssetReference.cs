@@ -16,7 +16,7 @@ public class AssetReference : MonoBehaviour
         LoadedAssetBundle tmpLoadedAssetBundle = AssetManager.GetSingleton().GetLoadedAssetBundle(mAssetBundleName);
         if (tmpLoadedAssetBundle != null)
         {
-            tmpLoadedAssetBundle.mReferenceList.Add(this);
+            tmpLoadedAssetBundle.AddReference(this);
         }
     }
 

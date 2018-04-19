@@ -71,6 +71,7 @@ public class AssetDemo : MonoBehaviour {
                     go0 = AssetManager.GetSingleton().Instantiate(plane, plane, varGo) as GameObject;
 
                     go2 = Instantiate(go0) as GameObject;
+                    go2.transform.position = go0.transform.position + new Vector3(5, 0, 0);
                 }
             });
         }

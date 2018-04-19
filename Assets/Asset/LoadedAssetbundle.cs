@@ -10,9 +10,13 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
     public AssetBundle mAssetBundle;
 
   
-    public List<LoadedAssetBundle> mDependenceList = new List<LoadedAssetBundle> ();
-    //场景中实例化出来的
-    public List<AssetReference> mReferenceList = new List<AssetReference>();
+    //该资源依赖别的资源
+    private List<LoadedAssetBundle> mDependenceList = new List<LoadedAssetBundle> ();
+    //场景中实例化出来的,即引用
+    private List<AssetReference> mReferenceList = new List<AssetReference>();
+
+    public int dependenceCount { get { return mDependenceList.Count; } }
+    public int referenceCount { get { return mReferenceList.Count; } }
 
     public LoadedAssetBundle() { }
 
@@ -26,7 +30,29 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 	}
 
 	
+    public void AddReference(AssetReference varReference)
+    {
+        if (varReference == null) { return; }
+        if(mReferenceList.Contains(varReference)==false)
+        {
+            mReferenceList.Add(varReference);
+        }
+    }
 
+    public void RemoveReference(AssetReference varReference)
+    {
+        if(varReference == null)
+        {
+            return;
+        }
+        for (int i = mReferenceList.Count - 1; i >= 0; --i)
+        {
+            if (mReferenceList[i] == null || mReferenceList[i] == varReference)
+            {
+                mReferenceList.RemoveAt(i);
+            }
+        }
+    }
 
 
 	private void AddDependence()
@@ -86,6 +112,15 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 			mAssetBundle.Unload (true);
 			mAssetBundle = null;
 		}
+
+        //卸载依赖
+        for (int i = 0, max = mDependenceList.Count; i < max; ++i)
+        {
+            if (AssetManager.GetSingleton().OtherDependence(mDependenceList[i].mAssetBundleName) == false)
+            {
+                AssetManager.GetSingleton().UnLoad(mDependenceList[i].mAssetBundleName);
+            }
+        }
         mDependenceList.Clear();
     }
 }

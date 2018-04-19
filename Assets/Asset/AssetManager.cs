@@ -313,14 +313,9 @@ public class AssetManager : MonoBehaviour {
         LoadedAssetBundle tmpLoadedAssetBundle = GetLoadedAssetBundle(varReference.mAssetBundleName);
         if (tmpLoadedAssetBundle != null)
         {
-            for(int i = tmpLoadedAssetBundle.mReferenceList.Count -1; i >=0; --i)
-            {
-                if(tmpLoadedAssetBundle.mReferenceList[i] == null || tmpLoadedAssetBundle.mReferenceList[i] == varReference)
-                {
-                    tmpLoadedAssetBundle.mReferenceList.RemoveAt(i);
-                }
-            }
-            if(tmpLoadedAssetBundle.mReferenceList.Count == 0)
+            tmpLoadedAssetBundle.RemoveReference(varReference);
+
+            if(tmpLoadedAssetBundle.referenceCount == 0)
             {
                 UnLoad(varReference.mAssetBundleName);
             }
@@ -395,31 +390,16 @@ public class AssetManager : MonoBehaviour {
         //先移除
 		mAssetBundleDic.Remove (tmpAssetBundleName);
 
-        //找出需要移除的依赖
-        List<LoadedAssetBundle> tmpUnLoadAssetBundleList = new List<LoadedAssetBundle>();
-
-        for (int i = 0,max = tmpLoadedAssetBundle.mDependenceList.Count; i <max; ++i)
-        {
-            if(OtherDependence(tmpLoadedAssetBundle.mDependenceList[i].mAssetBundleName) == false)
-            {
-                tmpUnLoadAssetBundleList.Add(tmpLoadedAssetBundle.mDependenceList[i]);
-            }
-        }
-
+       
+        //卸载本身以及单独的依赖
         tmpLoadedAssetBundle.UnLoad();
+
         LoadedAssetBundle.Recycle(tmpLoadedAssetBundle);
-
-        for (int i = 0,max = tmpUnLoadAssetBundleList.Count; i <max;++i )
-        {
-            UnLoad(tmpUnLoadAssetBundleList[i].mAssetBundleName);
-        }
-
-        tmpUnLoadAssetBundleList.Clear();
+    
     }
 
-    private bool OtherDependence(string varAssetBundleName)
+    public bool OtherDependence(string varAssetBundleName)
     {
-
         var it = mAssetBundleDic.GetEnumerator();
         while (it.MoveNext())
         {
@@ -429,7 +409,6 @@ public class AssetManager : MonoBehaviour {
                 return true;
             }
         }
-
         return false;
     }
 
