@@ -430,10 +430,13 @@ public class AssetManager : MonoBehaviour {
         for (int i = 0,  max = tmpAssetBundleArray.Length; i <max; ++i)
         {
             UnLoad(tmpAssetBundleArray[i]);
-        } 
-		
+        }
 
-		mAssetBundleDic.Clear ();
+        Array.Clear(tmpAssetBundleArray, 0, tmpAssetBundleArray.Length);
+        tmpAssetBundleArray = null;
+
+
+        mAssetBundleDic.Clear ();
 
 		if (mManifestAssetBundle) {
 			mManifestAssetBundle.Unload (true);
