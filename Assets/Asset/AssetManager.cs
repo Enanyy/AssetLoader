@@ -164,18 +164,19 @@ public class AssetManager : MonoBehaviour {
 		LoadTask tmpLoadTask = null;
         if (mAssetMode == 0)
         {
+#if UNITY_EDITOR
+            UnityEngine.Object tmpObj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(varAssetName);
 
-            //UnityEngine.Object tmpObj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(varAssetName);
+            if (varCallback != null)
+            {
+                varCallback(tmpObj);
+            }
+            tmpLoadTask = new LoadTask();
+            tmpLoadTask.Init(tmpAssetBundleName, null);
+            tmpLoadTask.mState = LoadTask.LoadTaskState.Loaded;
 
-            //if (varCallback != null)
-            //{
-            //    varCallback(tmpObj);
-            //}
-            //tmpLoadTask = new LoadTask(varAssetBundleName);
-            //tmpLoadTask.mState = LoadTask.LoadTaskState.Loaded;
-
-            //return tmpLoadTask;
-
+            return tmpLoadTask;
+#endif
         }
 
 		if (LoadAsset(tmpAssetBundleName, varAssetName, varCallback)) {
@@ -421,7 +422,7 @@ public class AssetManager : MonoBehaviour {
 	{
 		return Application.dataPath +"/../StreamingAssets/";
 	}
-
+   
 
 	void OnDestroy()
 	{

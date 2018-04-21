@@ -77,11 +77,13 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
                 }
             }
 		}
-        Debug.Log(mAssetBundleName + " dependence:" + mDependenceList.Count);
+        string log = mAssetBundleName + " dependence:" + mDependenceList.Count;
+       
         for (int i = 0, max = mDependenceList.Count; i <max; ++i)
         {
-            Debug.Log("             " + mDependenceList[i].mAssetBundleName);
+            log += "\n             " + mDependenceList[i].mAssetBundleName;
         }
+        Debug.Log(log);
 	}
   
 
