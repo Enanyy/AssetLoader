@@ -29,8 +29,33 @@ public class IPool<T> where T : class,new()
     {
         if (t != null && mCacheList.Contains(t) == false)
         {
+            
             mCacheList.Add(t);
         }
+    }
+
+    public virtual void Clear()
+    {
+
+    }
+}
+
+public class LoadAssetTask:IPool<LoadAssetTask>
+{
+  
+    public string mAssetName;
+    public Action<UnityEngine.Object> mCallback;
+
+    public LoadAssetTask() { }
+    public void Init(string varAssetName, Action<UnityEngine.Object> varCallback)
+    {
+        mAssetName = varAssetName;
+        mCallback = varCallback;
+    }
+    public override void Clear()
+    {
+        mAssetName = null;
+        mCallback = null;
     }
 }
 
@@ -45,19 +70,24 @@ public class LoadTask:IPool<LoadTask>
     }
 
     public string mAssetBundleName;
-    public System.Action<AssetBundle> mCallback;
+    
     public LoadTaskState mState;
     public AssetBundle mAssetBundle;
+
+    /// <summary>
+    /// 加载AssetBundle完成需要Load的资源
+    /// </summary>
+    private List<LoadAssetTask> mLoadAssetTaskList = new List<LoadAssetTask>();
 
     public LoadTask()
     {
        
     }
 
-    public void Init(string varAssetBundleName, Action<AssetBundle> varCallback)
+    public void Init(string varAssetBundleName)
     {
         mAssetBundleName = varAssetBundleName;
-        mCallback = varCallback;
+      
         mState = LoadTaskState.UnLoad;
         mAssetBundle = null;
     }
@@ -98,8 +128,6 @@ public class LoadTask:IPool<LoadTask>
             }
 
             mState = LoadTaskState.Loaded;
-
-
         }
         else
         {
@@ -107,11 +135,32 @@ public class LoadTask:IPool<LoadTask>
         }
     }
 
-    public void Clear()
+    public void AddLoadAssetTask(string varAssetName, Action<UnityEngine.Object> varCallback)
+    {
+        LoadAssetTask tmpLoadAssetTask = LoadAssetTask.Create();
+        tmpLoadAssetTask.Init(varAssetName, varCallback);
+        mLoadAssetTaskList.Add(tmpLoadAssetTask);
+    }
+    public void OnLoadFinish()
+    {
+        for (int i = 0; i < mLoadAssetTaskList.Count; ++i)
+        {
+            LoadAssetTask tmpLoadAssetTask = mLoadAssetTaskList[i];
+            if (tmpLoadAssetTask.mCallback != null)
+            {
+                UnityEngine.Object tmpObject = mAssetBundle.LoadAsset(tmpLoadAssetTask.mAssetName);
+                tmpLoadAssetTask.mCallback(tmpObject);
+            }
+            tmpLoadAssetTask.Clear();
+            LoadAssetTask.Recycle(tmpLoadAssetTask);
+        }
+        mLoadAssetTaskList.Clear();
+    }
+
+    public override void Clear()
     {
         mAssetBundleName = null;
         mAssetBundle = null;
-        mCallback = null;
         mState = LoadTaskState.UnLoad;
     }
 

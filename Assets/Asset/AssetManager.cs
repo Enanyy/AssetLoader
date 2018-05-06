@@ -75,11 +75,11 @@ public class AssetManager : MonoBehaviour {
 					Debug.Log("Loaded:"+tmpLoadTask.mAssetBundleName);
 
 					tmpLoadTask.mState = LoadTask.LoadTaskState.Loaded;
+                    tmpLoadTask.mAssetBundle = mAssetBundleDic[tmpAssetBundleName].mAssetBundle;
+                    tmpLoadTask.OnLoadFinish();
 
                     LoadTask.Recycle(mLoadTaskQueue.Dequeue ());
 
-
-                    tmpLoadTask.mCallback(mAssetBundleDic[tmpAssetBundleName].mAssetBundle);
 
                     return;
 				}
@@ -111,14 +111,16 @@ public class AssetManager : MonoBehaviour {
 				} 
 				else if (tmpLoadTask.mState == LoadTask.LoadTaskState.Loaded)
 				{
-					AssetBundle tmpAssetBundle = tmpLoadTask.mAssetBundle;
+					//AssetBundle tmpAssetBundle = tmpLoadTask.mAssetBundle;
 
-					if (tmpLoadTask.mCallback != null) 
-					{
-						tmpLoadTask.mCallback (tmpAssetBundle);
-					}
+					//if (tmpLoadTask.mCallback != null) 
+					//{
+					//	tmpLoadTask.mCallback (tmpAssetBundle);
+					//}
 
-					LoadTask.Recycle( mLoadTaskQueue.Dequeue ());
+                    OnLoadTaskFinish(tmpLoadTask);
+
+                    LoadTask.Recycle( mLoadTaskQueue.Dequeue ());
 
 					//Debug.Log ("LoadTask Count:" + mLoadingAssetQueue.Count);
 				}
@@ -152,6 +154,35 @@ public class AssetManager : MonoBehaviour {
 
     }
 
+
+    private void OnLoadTaskFinish(LoadTask varLoadTask)
+    {
+        if (varLoadTask == null) { return; }
+
+
+        string tmpAssetBundleName = varLoadTask.mAssetBundleName.ToLower();
+
+
+        if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
+        {
+            AssetBundle tmpAssetBundle = varLoadTask.mAssetBundle;
+
+            LoadedAssetBundle tmpLoadedAssetBundle = LoadedAssetBundle.Create();
+            tmpLoadedAssetBundle.Init(tmpAssetBundleName, tmpAssetBundle);
+
+
+            mAssetBundleDic.Add(tmpAssetBundleName, tmpLoadedAssetBundle);
+        }
+        else
+        {
+            varLoadTask.mAssetBundle = mAssetBundleDic[tmpAssetBundleName].mAssetBundle;
+            
+        }
+
+        varLoadTask.OnLoadFinish();
+
+    }
+
     /// <summary>
     /// AssetBundle name is "Assets/..."
     /// </summary>
@@ -172,16 +203,30 @@ public class AssetManager : MonoBehaviour {
                 varCallback(tmpObj);
             }
             tmpLoadTask = new LoadTask();
-            tmpLoadTask.Init(tmpAssetBundleName, null);
+            tmpLoadTask.Init(tmpAssetBundleName);
             tmpLoadTask.mState = LoadTask.LoadTaskState.Loaded;
 
             return tmpLoadTask;
 #endif
         }
 
-		if (LoadAsset(tmpAssetBundleName, varAssetName, varCallback)) {
+		if (mAssetBundleDic.ContainsKey(varAssetBundleName)) {
 
-			tmpLoadTask =  LoadTask.Create();
+            LoadedAssetBundle tmpLoadedAssetBundle =  mAssetBundleDic[tmpAssetBundleName];
+
+            UnityEngine.Object tmpObject = null;
+            if (tmpLoadedAssetBundle != null && tmpLoadedAssetBundle.mAssetBundle != null)
+            {
+
+                 tmpObject = tmpLoadedAssetBundle.mAssetBundle.LoadAsset(varAssetName);
+
+            }
+            if(varCallback!=null)
+            {
+                varCallback(tmpObject);
+            }
+
+            tmpLoadTask =  LoadTask.Create();
            
             LoadTask.Recycle(tmpLoadTask);
 
@@ -190,36 +235,10 @@ public class AssetManager : MonoBehaviour {
 
         tmpLoadTask = GetLoadTask(tmpAssetBundleName);
 
-        Action<AssetBundle> tmpLoadAssetBindleFinishAction = delegate (AssetBundle varAssetBundle)
-        {
-            if (varAssetBundle)
-            {
-                if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
-                {
-
-                    LoadedAssetBundle tmpLoadedAssetBundle = LoadedAssetBundle.Create();
-                    tmpLoadedAssetBundle.Init(tmpAssetBundleName, varAssetBundle);
-
-
-                    mAssetBundleDic.Add(tmpAssetBundleName, tmpLoadedAssetBundle);
-                }
-
-                LoadAsset(tmpAssetBundleName, varAssetName, varCallback);
-            }
-            else
-            {
-                if (varCallback != null)
-                {
-
-                    varCallback(null);
-                }
-            }
-        };
-
         if (tmpLoadTask!=null)
         {
-            tmpLoadTask.mCallback += tmpLoadAssetBindleFinishAction;
-
+          
+            tmpLoadTask.AddLoadAssetTask(varAssetName, varCallback);
             return tmpLoadTask;
         }
 
@@ -234,16 +253,7 @@ public class AssetManager : MonoBehaviour {
                 if (!mAssetBundleDic.ContainsKey(tmpDependentAssetBundleName) && GetLoadTask(tmpDependentAssetBundleName) == null)
                 {
                     LoadTask tmpDependenceLoadTask = LoadTask.Create();
-                    tmpDependenceLoadTask.Init(tmpDependentAssetBundleName, (varAssetBundle) =>
-                    {
-
-                        LoadedAssetBundle tmpLoadedAssetBundle = LoadedAssetBundle.Create();
-                        tmpLoadedAssetBundle.Init(tmpDependentAssetBundleName, varAssetBundle);
-
-
-                        mAssetBundleDic.Add(tmpDependentAssetBundleName, tmpLoadedAssetBundle);
-
-                    });
+                    tmpDependenceLoadTask.Init(tmpDependentAssetBundleName);
                    
                     mLoadTaskQueue.Enqueue(tmpDependenceLoadTask);
                 }
@@ -251,41 +261,12 @@ public class AssetManager : MonoBehaviour {
         }
 			
 		tmpLoadTask = LoadTask.Create ();
-        tmpLoadTask.Init(tmpAssetBundleName, tmpLoadAssetBindleFinishAction);
-       
+        tmpLoadTask.Init(tmpAssetBundleName);
+        tmpLoadTask.AddLoadAssetTask(varAssetName, varCallback);
+
         mLoadTaskQueue.Enqueue (tmpLoadTask);
 
 		return tmpLoadTask;
-	}
-
-
-	private bool LoadAsset(string varAssetBundleName, string varAssetName, System.Action<UnityEngine.Object> varCallback)
-	{
-		UnityEngine.Object tmpObject = null;
-
-        if (string.IsNullOrEmpty(varAssetName) == false)
-        {
-            string tmpAssetBundleName = varAssetBundleName.ToLower();
-
-            LoadedAssetBundle tmpLoadedAssetBundle = null;
-
-            mAssetBundleDic.TryGetValue(tmpAssetBundleName, out tmpLoadedAssetBundle);
-
-            if (tmpLoadedAssetBundle != null && tmpLoadedAssetBundle.mAssetBundle != null)
-            {
-
-                tmpObject = tmpLoadedAssetBundle.mAssetBundle.LoadAsset(varAssetName);
-
-            }
-        }
-
-        if (varCallback != null)
-        {
-
-            varCallback(tmpObject);
-        }
-
-        return tmpObject!=null;
 	}
 
     public  GameObject Instantiate(string varAssetBundleName,string varAssetName, UnityEngine.Object varObject)
