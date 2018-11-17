@@ -22,7 +22,10 @@ public class AssetEntity
             this.bundleEntity.AddReference(this);
         }
     }
-
+    ~AssetEntity()
+    {
+        Destroy();
+    }
  
 
     public virtual  void Destroy()

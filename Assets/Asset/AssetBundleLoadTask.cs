@@ -76,7 +76,6 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
     public LoadStatus state { get; set; }
     public AssetBundle assetBundle { get; private set; }
 
-    private Dictionary<string, UnityEngine.Object> mAssetDic = new Dictionary<string, UnityEngine.Object>();
     /// <summary>
     /// 加载AssetBundle完成需要Load的资源
     /// </summary>
@@ -156,11 +155,8 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
             AssetLoadTask tmpAssetLoadTask = mAssetLoadTaskList[i];
             if (tmpAssetLoadTask.callback != null)
             {
-                if (mAssetDic.ContainsKey(tmpAssetLoadTask.assetName) == false)
-                {
-                    mAssetDic[tmpAssetLoadTask.assetName] = assetBundle.LoadAsset(tmpAssetLoadTask.assetName);
-                }
-                AssetEntity asset = new AssetEntity(bundleEntity, mAssetDic[tmpAssetLoadTask.assetName], tmpAssetLoadTask.assetName);
+                UnityEngine.Object tmpObject  = bundleEntity.LoadAsset(tmpAssetLoadTask.assetName);
+                AssetEntity asset = new AssetEntity(bundleEntity, tmpObject, tmpAssetLoadTask.assetName);
 
                 tmpAssetLoadTask.callback(asset);
             }

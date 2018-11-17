@@ -12,6 +12,8 @@ public class AssetBundleEntity:IPool<AssetBundleEntity>
     private List<AssetBundleEntity> mDependenceList = new List<AssetBundleEntity> ();
     //场景中实例化出来的,即引用
     private List<AssetEntity> mReferenceList = new List<AssetEntity>();
+    //已经加载出来的asset
+    private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
 
     public int dependenceCount { get { return mDependenceList.Count; } }
     public int referenceCount { get { return mReferenceList.Count; } }
@@ -102,6 +104,16 @@ public class AssetBundleEntity:IPool<AssetBundleEntity>
             }
         }
         return false;
+    }
+
+    public Object LoadAsset(string assetName)
+    {
+        if (mAssetDic.ContainsKey(assetName) == false)
+        {
+            mAssetDic.Add(assetName, assetBundle.LoadAsset(assetName));
+        }
+
+        return mAssetDic[assetName];
     }
 
     public void UnLoad()
