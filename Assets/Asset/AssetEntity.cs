@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AssetEntity 
 {
-    public AssetBundleEntity assetBundle { get; private set; }
+    public AssetBundleEntity bundleEntity { get; private set; }
   
     public string assetName { get; private set; }
 
@@ -14,12 +14,12 @@ public class AssetEntity
     public AssetEntity(AssetBundleEntity assetBundle,Object assetObject, string assetName)
     {
         this.assetName = assetName;
-        this.assetBundle = assetBundle;
+        this.bundleEntity = assetBundle;
         this.assetObject = assetObject;
 
-        if(this.assetBundle!=null)
+        if(this.bundleEntity!=null)
         {
-            this.assetBundle.AddReference(this);
+            this.bundleEntity.AddReference(this);
         }
     }
 

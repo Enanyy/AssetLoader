@@ -145,11 +145,11 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
         mAssetLoadTaskList.Add(tmpLoadAssetTask);
 
     }
-    public void LoadFinish(AssetBundleEntity bundle)
+    public void LoadFinish(AssetBundleEntity bundleEntity)
     {
         if(assetBundle==null)
         {
-            assetBundle = bundle.assetBundle;
+            assetBundle = bundleEntity.assetBundle;
         }
         for (int i = 0; i < mAssetLoadTaskList.Count; ++i)
         {
@@ -160,7 +160,7 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
                 {
                     mAssetDic[tmpAssetLoadTask.assetName] = assetBundle.LoadAsset(tmpAssetLoadTask.assetName);
                 }
-                AssetEntity asset = new AssetEntity(bundle, mAssetDic[tmpAssetLoadTask.assetName], tmpAssetLoadTask.assetName);
+                AssetEntity asset = new AssetEntity(bundleEntity, mAssetDic[tmpAssetLoadTask.assetName], tmpAssetLoadTask.assetName);
 
                 tmpAssetLoadTask.callback(asset);
             }

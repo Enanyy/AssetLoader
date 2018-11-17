@@ -161,11 +161,11 @@ public class AssetManager : MonoBehaviour {
         {
             AssetBundle tmpAssetBundle = varLoadTask.assetBundle;
 
-            AssetBundleEntity tmpAssetBundleEntity = AssetBundleEntity.Create();
-            tmpAssetBundleEntity.Init(tmpAssetBundleName, tmpAssetBundle);
+            AssetBundleEntity tmpBundleEntity = AssetBundleEntity.Create();
+            tmpBundleEntity.Init(tmpAssetBundleName, tmpAssetBundle);
 
 
-            mAssetBundleDic.Add(tmpAssetBundleName, tmpAssetBundleEntity);
+            mAssetBundleDic.Add(tmpAssetBundleName, tmpBundleEntity);
         }
       
 
@@ -203,16 +203,16 @@ public class AssetManager : MonoBehaviour {
 
 		if (mAssetBundleDic.ContainsKey(varAssetBundleName)) {
 
-            AssetBundleEntity tmpAssetBundleEntity =  mAssetBundleDic[tmpAssetBundleName];
+            AssetBundleEntity tmpBundleEntity =  mAssetBundleDic[tmpAssetBundleName];
 
             UnityEngine.Object tmpObject = null;
-            if (tmpAssetBundleEntity != null && tmpAssetBundleEntity.assetBundle != null)
+            if (tmpBundleEntity != null && tmpBundleEntity.assetBundle != null)
             {
-                 tmpObject = tmpAssetBundleEntity.assetBundle.LoadAsset(varAssetName);
+                 tmpObject = tmpBundleEntity.assetBundle.LoadAsset(varAssetName);
             }
             if(varCallback!=null)
             {
-                AssetEntity asset = new AssetEntity(tmpAssetBundleEntity, tmpObject, varAssetName);
+                AssetEntity asset = new AssetEntity(tmpBundleEntity, tmpObject, varAssetName);
 
                 varCallback(asset);
             }
@@ -227,8 +227,7 @@ public class AssetManager : MonoBehaviour {
         tmpLoadTask = GetLoadTask(tmpAssetBundleName);
 
         if (tmpLoadTask!=null)
-        {
-          
+        {      
             tmpLoadTask.AddAssetLoadTask(varAssetName, varCallback);
             return tmpLoadTask;
         }
@@ -263,19 +262,19 @@ public class AssetManager : MonoBehaviour {
 
     public void Destroy(AssetEntity varReference)
     {
-        if (varReference == null || varReference.assetBundle == null)
+        if (varReference == null || varReference.bundleEntity == null)
         {
             return;
         }
       
-        AssetBundleEntity tmpLoadedAssetBundle = varReference.assetBundle;
-        if (tmpLoadedAssetBundle != null)
+        AssetBundleEntity tmpBundleEntity = varReference.bundleEntity;
+        if (tmpBundleEntity != null)
         {
-            tmpLoadedAssetBundle.RemoveReference(varReference);
+            tmpBundleEntity.RemoveReference(varReference);
 
-            if(tmpLoadedAssetBundle.referenceCount == 0)
+            if(tmpBundleEntity.referenceCount == 0)
             {
-                UnLoad(varReference.assetBundle.assetBundleName);
+                UnLoad(varReference.bundleEntity.assetBundleName);
             }
         }
         
@@ -283,11 +282,11 @@ public class AssetManager : MonoBehaviour {
 
 	public AssetBundleEntity GetAssetBundle(string varAssetbundleName)
 	{
-		AssetBundleEntity tmpAssetBundleEntity = null;
+		AssetBundleEntity tmpBundleEntity = null;
 
-		mAssetBundleDic.TryGetValue (varAssetbundleName.ToLower(), out  tmpAssetBundleEntity);
+		mAssetBundleDic.TryGetValue (varAssetbundleName.ToLower(), out  tmpBundleEntity);
 
-		return tmpAssetBundleEntity;
+		return tmpBundleEntity;
 	}
 
 	public void LoadScene(string varAssetBundleName,System.Action varCallback)

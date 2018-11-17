@@ -66,11 +66,11 @@ public class AssetBundleEntity:IPool<AssetBundleEntity>
 
                     string tmpDependence = tmpDependencesArray[i].ToLower();
 
-                    AssetBundleEntity tmpLoadedAssetBundle = AssetManager.GetSingleton().GetAssetBundle(tmpDependence);
+                    AssetBundleEntity tmpBundleEntity = AssetManager.GetSingleton().GetAssetBundle(tmpDependence);
 
-                    if (tmpLoadedAssetBundle != null && mDependenceList.Contains(tmpLoadedAssetBundle) == false)
+                    if (tmpBundleEntity != null && mDependenceList.Contains(tmpBundleEntity) == false)
                     {
-                        mDependenceList.Add(tmpLoadedAssetBundle);
+                        mDependenceList.Add(tmpBundleEntity);
                     }
                 }
             }
