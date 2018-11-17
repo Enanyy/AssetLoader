@@ -2,35 +2,33 @@
 using System.Collections.Generic;
 
 
-public class LoadedAssetBundle:IPool<LoadedAssetBundle>
+public class AssetBundleEntity:IPool<AssetBundleEntity>
 {
-	
-
-    public string mAssetBundleName;
-    public AssetBundle mAssetBundle;
+    public string assetBundleName { get; private set; }
+    public AssetBundle assetBundle { get; private set; }
 
   
     //该资源依赖别的资源
-    private List<LoadedAssetBundle> mDependenceList = new List<LoadedAssetBundle> ();
+    private List<AssetBundleEntity> mDependenceList = new List<AssetBundleEntity> ();
     //场景中实例化出来的,即引用
-    private List<AssetReference> mReferenceList = new List<AssetReference>();
+    private List<AssetEntity> mReferenceList = new List<AssetEntity>();
 
     public int dependenceCount { get { return mDependenceList.Count; } }
     public int referenceCount { get { return mReferenceList.Count; } }
 
-    public LoadedAssetBundle() { }
+    public AssetBundleEntity() { }
 
 	public void Init(string varAssetBundleName,AssetBundle varAssetbundle)
 	{
-		mAssetBundleName = varAssetBundleName;
-		mAssetBundle =varAssetbundle;
+		assetBundleName = varAssetBundleName;
+		assetBundle =varAssetbundle;
 	
       
 		AddDependence ();
 	}
 
 	
-    public void AddReference(AssetReference varReference)
+    public void AddReference(AssetEntity varReference)
     {
         if (varReference == null) { return; }
         if(mReferenceList.Contains(varReference)==false)
@@ -39,7 +37,7 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
         }
     }
 
-    public void RemoveReference(AssetReference varReference)
+    public void RemoveReference(AssetEntity varReference)
     {
         if(varReference == null)
         {
@@ -57,9 +55,9 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 
 	private void AddDependence()
 	{
-		if ( mAssetBundle != null) {
+		if ( assetBundle != null) {
 		
-			string[] tmpDependencesArray = AssetManager.GetSingleton().GetAllDependencies (mAssetBundleName);
+			string[] tmpDependencesArray = AssetManager.GetSingleton().GetAllDependencies (assetBundleName);
 
             if (tmpDependencesArray != null)
             {
@@ -68,7 +66,7 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 
                     string tmpDependence = tmpDependencesArray[i].ToLower();
 
-                    LoadedAssetBundle tmpLoadedAssetBundle = AssetManager.GetSingleton().GetLoadedAssetBundle(tmpDependence);
+                    AssetBundleEntity tmpLoadedAssetBundle = AssetManager.GetSingleton().GetAssetBundle(tmpDependence);
 
                     if (tmpLoadedAssetBundle != null && mDependenceList.Contains(tmpLoadedAssetBundle) == false)
                     {
@@ -77,11 +75,11 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
                 }
             }
 		}
-        string log = mAssetBundleName + " dependence:" + mDependenceList.Count;
+        string log = assetBundleName + " dependence:" + mDependenceList.Count;
        
         for (int i = 0, max = mDependenceList.Count; i <max; ++i)
         {
-            log += "\n             " + mDependenceList[i].mAssetBundleName;
+            log += "\n             " + mDependenceList[i].assetBundleName;
         }
         Debug.Log(log);
 	}
@@ -98,7 +96,7 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 
         for(int i = 0,max = mDependenceList.Count; i <max; ++i )
         {
-            if(mDependenceList[i].mAssetBundleName == varAssetBundleName)
+            if(mDependenceList[i].assetBundleName == varAssetBundleName)
             {
                 return true;
             }
@@ -108,19 +106,19 @@ public class LoadedAssetBundle:IPool<LoadedAssetBundle>
 
     public void UnLoad()
 	{
-        mAssetBundleName = null;
-        if (mAssetBundle != null) {
+        assetBundleName = null;
+        if (assetBundle != null) {
 			
-			mAssetBundle.Unload (true);
-			mAssetBundle = null;
+			assetBundle.Unload (true);
+			assetBundle = null;
 		}
 
         //卸载依赖
         for (int i = 0, max = mDependenceList.Count; i < max; ++i)
         {
-            if (AssetManager.GetSingleton().OtherDependence(mDependenceList[i].mAssetBundleName) == false)
+            if (AssetManager.GetSingleton().OtherDependence(mDependenceList[i].assetBundleName) == false)
             {
-                AssetManager.GetSingleton().UnLoad(mDependenceList[i].mAssetBundleName);
+                AssetManager.GetSingleton().UnLoad(mDependenceList[i].assetBundleName);
             }
         }
         mDependenceList.Clear();

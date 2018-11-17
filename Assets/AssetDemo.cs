@@ -18,7 +18,7 @@ public class AssetDemo : MonoBehaviour {
 
         string plane = "assets/r/Plane.prefab";
 
-
+        /*
 
         AssetManager.GetSingleton().Load(plane, plane, (varGo) => {
 
@@ -38,7 +38,7 @@ public class AssetDemo : MonoBehaviour {
                 go1 = AssetManager.GetSingleton().Instantiate(cube, cube, varGo) as GameObject;
             }
         });
-       
+       */
     }
 
     List<GameObject> mList = new List<GameObject>();
@@ -67,7 +67,7 @@ public class AssetDemo : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Keypad3))
         {
             string plane = "assets/r/Plane.prefab";
-
+            /*
             AssetManager.GetSingleton().Load(plane, plane, (varGo) =>
             {
 
@@ -78,6 +78,7 @@ public class AssetDemo : MonoBehaviour {
                     mList.Add(go);
                 }
             });
+            */
         }
     }
 	
