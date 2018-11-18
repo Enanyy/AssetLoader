@@ -24,7 +24,7 @@ public class AssetDemo : MonoBehaviour {
 
             if(varGo != null)
             {
-               
+                go0 = varGo;
             }
         });
 
@@ -49,7 +49,8 @@ public class AssetDemo : MonoBehaviour {
         if(Input.GetKeyDown(KeyCode.Keypad0))
         {
             //Destroy(go0);
-
+            go0.Destroy();
+            go0 = null;
            
         }
         if (Input.GetKeyDown(KeyCode.Keypad1))

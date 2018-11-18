@@ -4,6 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
+public enum LoadType
+{
+    Sync,
+    Async,
+}
 
 public class AssetBundleManager  {
 
@@ -27,6 +32,8 @@ public class AssetBundleManager  {
 	Queue<AssetBundleLoadTask> mAssetBundleLoadTaskQueue = new Queue<AssetBundleLoadTask>();
 
     int mAssetMode = 0;
+
+    public LoadType loadType = LoadType.Async;
 
     public void Init()
 	{
@@ -87,16 +94,14 @@ public class AssetBundleManager  {
 				}
 				else if (tmpLoadTask.state == LoadStatus.Wait) 
 				{
-					#if false
-
-					tmpLoadTask.LoadSync();
-
-					#else
-
-					tmpLoadTask.LoadAsync ();
-
-					#endif
-
+                    if (loadType == LoadType.Sync)
+                    {
+                        tmpLoadTask.LoadSync();
+                    }
+                    else
+                    {
+                        tmpLoadTask.LoadAsync();
+                    }
 					//Debug.Log("Start Load:"+tmpLoadTask.mAssetBundleName);
 
 					return;

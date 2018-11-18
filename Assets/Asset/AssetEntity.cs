@@ -45,6 +45,7 @@ public class AssetEntity
     public virtual  void Destroy()
     {
         AssetBundleManager.GetSingleton().Destroy(this);
+        Object.Destroy(gameObject);
        
     }
 
