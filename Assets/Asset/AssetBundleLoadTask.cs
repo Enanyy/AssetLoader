@@ -154,11 +154,10 @@ public class AssetBundleLoadTask
         {
             AssetLoadTask tmpAssetLoadTask = mAssetLoadTaskList[i];
             if (tmpAssetLoadTask.callback != null)
-            {
-                UnityEngine.Object tmpObject  = varBundleEntity.LoadAsset(tmpAssetLoadTask.assetName);
-                AssetEntity asset = new AssetEntity(varBundleEntity, tmpObject, tmpAssetLoadTask.assetName);
+            {            
+                AssetEntity tmpAsset = new AssetEntity(varBundleEntity,  tmpAssetLoadTask.assetName);
 
-                tmpAssetLoadTask.callback(asset);
+                tmpAssetLoadTask.callback(tmpAsset);
             }
             tmpAssetLoadTask.Clear();
            

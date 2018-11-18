@@ -10,7 +10,7 @@ public class AssetDemo : MonoBehaviour {
     AssetEntity go2;
     void Awake()
     {
-        AssetBundleManager.GetSingleton();
+        AssetBundleManager.GetSingleton().Init();
     }
 	// Use this for initialization
 	void Start () {
@@ -44,6 +44,8 @@ public class AssetDemo : MonoBehaviour {
     List<GameObject> mList = new List<GameObject>();
     void Update()
     {
+        AssetBundleManager.GetSingleton().Update();
+
         if(Input.GetKeyDown(KeyCode.Keypad0))
         {
             //Destroy(go0);
@@ -82,6 +84,10 @@ public class AssetDemo : MonoBehaviour {
         }
     
     }
-	
-	
+
+    private void OnApplicationQiut()
+    {
+        AssetBundleManager.GetSingleton().Destroy();
+    }
+
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 
 
-public class AssetBundleManager : MonoBehaviour {
+public class AssetBundleManager  {
 
     #region GetSingleton
     private static AssetBundleManager mInstance;
@@ -13,9 +13,7 @@ public class AssetBundleManager : MonoBehaviour {
     {
         if(mInstance == null)
         {
-            GameObject go = new GameObject("AssetManager");
-            DontDestroyOnLoad(go);
-            mInstance = go.AddComponent<AssetBundleManager>();
+            mInstance = new AssetBundleManager();
         }
         return mInstance;
     }
@@ -30,7 +28,7 @@ public class AssetBundleManager : MonoBehaviour {
 
     int mAssetMode = 0;
 
-    void Awake()
+    public void Init()
 	{
 		string tmpAssetManifest = GetAssetBundlePath () + "StreamingAssets";
 		if (File.Exists (tmpAssetManifest)) {
@@ -41,7 +39,7 @@ public class AssetBundleManager : MonoBehaviour {
 			
 				mManifest = mManifestAssetBundle.LoadAsset ("AssetBundleManifest") as AssetBundleManifest;
 
-				DontDestroyOnLoad (mManifest);
+			    UnityEngine.Object.DontDestroyOnLoad (mManifest);
 			
 			}
 		}
@@ -49,12 +47,8 @@ public class AssetBundleManager : MonoBehaviour {
         mAssetMode = PlayerPrefs.GetInt("assetmode");
     }
 
-	void Start()
-	{
 
-	}
-
-	void Update()
+	public void Update()
 	{
 		if (mAssetBundleLoadTaskQueue.Count > 0) {
 
@@ -186,11 +180,11 @@ public class AssetBundleManager : MonoBehaviour {
         if (mAssetMode == 0)
         {
 #if UNITY_EDITOR
-            UnityEngine.Object tmpObj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(varAssetName);
+            UnityEngine.Object tmpAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(varAssetName);
 
             if (varCallback != null)
             {
-                AssetEntity asset = new AssetEntity(null, tmpObj, varAssetName);
+                AssetEntity asset = new AssetEntity( tmpAsset, varAssetName);
                 varCallback(asset);
             }
             tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
@@ -206,13 +200,8 @@ public class AssetBundleManager : MonoBehaviour {
             if(varCallback!=null)
             {
                 AssetBundleEntity tmpBundleEntity = mAssetBundleDic[tmpAssetBundleName];
-
-                UnityEngine.Object tmpObject = null;
-                if (tmpBundleEntity != null)
-                {
-                    tmpObject = tmpBundleEntity.LoadAsset(varAssetName);
-                }
-                AssetEntity asset = new AssetEntity(tmpBundleEntity, tmpObject, varAssetName);
+         
+                AssetEntity asset = new AssetEntity(tmpBundleEntity,  varAssetName);
 
                 varCallback(asset);
             }
@@ -376,7 +365,7 @@ public class AssetBundleManager : MonoBehaviour {
 	}
    
 
-	void OnDestroy()
+	public void Destroy()
 	{
         string[] tmpAssetBundleArray = new string[mAssetBundleDic.Count];
         mAssetBundleDic.Keys.CopyTo(tmpAssetBundleArray, 0);

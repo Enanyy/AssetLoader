@@ -11,21 +11,34 @@ public class AssetEntity
 
     public GameObject gameObject { get; private set; }
 
-    public AssetEntity(AssetBundleEntity varBundleEntity,Object varAsset, string varAssetName)
+    public AssetEntity(AssetBundleEntity varBundleEntity, string varAssetName)
     {
         assetName = varAssetName;
         bundleEntity = varBundleEntity;
-        asset = varAsset;
 
         if(bundleEntity!=null)
         {
+            asset = bundleEntity.LoadAsset(assetName);
             bundleEntity.AddReference(this);
+            gameObject = Object.Instantiate(asset) as GameObject;
         }
+        else
+        {
+            Debug.LogError("assetBundle is null!!");
+        }
+        
+    }
+
+    public AssetEntity(Object varAsset,string varAssetName)
+    {
+        asset = varAsset;
+        assetName = varAssetName;
         gameObject = Object.Instantiate(asset) as GameObject;
     }
+
     ~AssetEntity()
     {
-        //Destroy();
+        Destroy();
     }
  
 
