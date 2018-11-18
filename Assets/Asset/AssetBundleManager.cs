@@ -68,7 +68,7 @@ public class AssetBundleManager  {
 				{
 					Debug.Log("Loaded:"+tmpLoadTask.assetBundleName);
 
-					tmpLoadTask.state = LoadStatus.Loaded;
+					tmpLoadTask.state = LoadStatus.Finish;
                    
                     tmpLoadTask.LoadFinish(mAssetBundleDic[tmpAssetBundleName]);
 
@@ -78,20 +78,22 @@ public class AssetBundleManager  {
                     return;
 				}
 
-				if (tmpLoadTask.state == LoadStatus.Cancel) {
-
+				if (tmpLoadTask.state == LoadStatus.Cancel||
+                    tmpLoadTask.state == LoadStatus.Error
+                    )
+                {
                     mAssetBundleLoadTaskQueue.Dequeue ();
 					return;
 				}
-				else if (tmpLoadTask.state == LoadStatus.UnLoad) 
+				else if (tmpLoadTask.state == LoadStatus.Wait) 
 				{
-					#if true
+					#if false
 
-					tmpLoadTask.Load();
+					tmpLoadTask.LoadSync();
 
 					#else
 
-					StartCoroutine (tmpLoadTask.LoadAsync ());
+					tmpLoadTask.LoadAsync ();
 
 					#endif
 
@@ -101,9 +103,11 @@ public class AssetBundleManager  {
 				} 
 				else if (tmpLoadTask.state ==LoadStatus.Loading) 
 				{
+                    tmpLoadTask.CheckLoadAsync();
+
 					return;
 				} 
-				else if (tmpLoadTask.state == LoadStatus.Loaded)
+				else if (tmpLoadTask.state == LoadStatus.Finish)
 				{
 					
                     OnAssetBundleLoadTaskFinish(tmpLoadTask);
@@ -189,7 +193,7 @@ public class AssetBundleManager  {
             }
             tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
 
-            tmpLoadTask.state = LoadStatus.Loaded;
+            tmpLoadTask.state = LoadStatus.Finish;
 
             return tmpLoadTask;
 #endif

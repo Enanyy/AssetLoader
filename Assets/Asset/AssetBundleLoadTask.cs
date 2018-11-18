@@ -44,10 +44,11 @@ public class IPool<T> where T : IPool<T>,new()
 
 public enum LoadStatus
 {
-    UnLoad,
+    Wait,
     Loading,
-    Loaded,
+    Finish,
     Cancel,
+    Error,
 }
 public class AssetLoadTask
 {
@@ -70,11 +71,12 @@ public class AssetLoadTask
 
 public class AssetBundleLoadTask
 {
-    
 
     public string assetBundleName { get; private set; }
     public LoadStatus state { get; set; }
     public AssetBundle assetBundle { get; private set; }
+    private AssetBundleCreateRequest mRequest;
+
 
     /// <summary>
     /// 加载AssetBundle完成需要Load的资源
@@ -90,50 +92,55 @@ public class AssetBundleLoadTask
     {
         assetBundleName = varAssetBundleName;
       
-        state = LoadStatus.UnLoad;
+        state = LoadStatus.Wait;
         assetBundle = null;
     }
    
 
-    public void Load()
+    public void LoadSync()
     {
         state = LoadStatus.Loading;
         string tmpFullPath = AssetBundleManager.GetAssetBundlePath() + assetBundleName;
         if (File.Exists(tmpFullPath))
         {
-
             assetBundle = AssetBundle.LoadFromFile(tmpFullPath);
 
-            state = LoadStatus.Loaded;
-
+            state = LoadStatus.Finish;
         }
         else
         {
             Debug.Log("Can not find file:" + tmpFullPath);
-            state = LoadStatus.Loaded;
+            state = LoadStatus.Error;
         }
     }
 
-    public IEnumerator LoadAsync()
+    public void LoadAsync()
     {
         string tmpFullPath = AssetBundleManager.GetAssetBundlePath() + assetBundleName;
         if (File.Exists(tmpFullPath))
         {
-            AssetBundleCreateRequest tmpRequest = AssetBundle.LoadFromFileAsync(tmpFullPath);
-            state = LoadStatus.Loading;
-            yield return tmpRequest;
-
-            if (tmpRequest.isDone)
-            {
-
-                assetBundle = tmpRequest.assetBundle;
-            }
-
-            state = LoadStatus.Loaded;
+            mRequest = AssetBundle.LoadFromFileAsync(tmpFullPath);
+            state = LoadStatus.Loading;         
         }
         else
         {
-            state = LoadStatus.Loaded;
+            state = LoadStatus.Error;
+        }
+    }
+
+    public void CheckLoadAsync()
+    {
+        if(mRequest!=null)
+        {
+            if(mRequest.isDone)
+            {
+                assetBundle = mRequest.assetBundle;
+                state = LoadStatus.Finish;
+            }
+        }
+        else
+        {
+            state = LoadStatus.Error;
         }
     }
 
