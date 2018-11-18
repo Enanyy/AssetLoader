@@ -5,17 +5,17 @@ using System.Collections.Generic;
 using System.IO;
 
 
-public class AssetManager : MonoBehaviour {
+public class AssetBundleManager : MonoBehaviour {
 
     #region GetSingleton
-    private static AssetManager mInstance;
-    public static AssetManager GetSingleton()
+    private static AssetBundleManager mInstance;
+    public static AssetBundleManager GetSingleton()
     {
         if(mInstance == null)
         {
             GameObject go = new GameObject("AssetManager");
             DontDestroyOnLoad(go);
-            mInstance = go.AddComponent<AssetManager>();
+            mInstance = go.AddComponent<AssetBundleManager>();
         }
         return mInstance;
     }
@@ -334,23 +334,23 @@ public class AssetManager : MonoBehaviour {
  
 
 
-    public void UnLoad(AssetBundleEntity bundleEntity)
+    public void UnLoad(AssetBundleEntity varBundleEntity)
 	{
-        if(bundleEntity == null)
+        if(varBundleEntity == null)
         {
             return;
         }
-        Debug.Log("UnLoad:"+ bundleEntity.assetBundleName);
+        Debug.Log("UnLoad:"+ varBundleEntity.assetBundleName);
 
 
-        string tmpAssetBundleName = bundleEntity.assetBundleName.ToLower();
+        string tmpAssetBundleName = varBundleEntity.assetBundleName.ToLower();
 	
         //先移除
 		mAssetBundleDic.Remove (tmpAssetBundleName);
 
 
         //卸载本身以及单独的依赖
-        bundleEntity.UnLoad();
+        varBundleEntity.UnLoad();
 
     
     }

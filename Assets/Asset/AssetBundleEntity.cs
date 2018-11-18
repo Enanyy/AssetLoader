@@ -59,7 +59,7 @@ public class AssetBundleEntity
 	{
 		if ( assetBundle != null) {
 		
-			string[] tmpDependencesArray = AssetManager.GetSingleton().GetAllDependencies (assetBundleName);
+			string[] tmpDependencesArray = AssetBundleManager.GetSingleton().GetAllDependencies (assetBundleName);
 
             if (tmpDependencesArray != null)
             {
@@ -68,7 +68,7 @@ public class AssetBundleEntity
 
                     string tmpDependence = tmpDependencesArray[i].ToLower();
 
-                    AssetBundleEntity tmpBundleEntity = AssetManager.GetSingleton().GetAssetBundle(tmpDependence);
+                    AssetBundleEntity tmpBundleEntity = AssetBundleManager.GetSingleton().GetAssetBundle(tmpDependence);
 
                     if (tmpBundleEntity != null && mDependenceList.Contains(tmpBundleEntity) == false)
                     {
@@ -106,14 +106,14 @@ public class AssetBundleEntity
         return false;
     }
 
-    public Object LoadAsset(string assetName)
+    public Object LoadAsset(string varAssetName)
     {
-        if (mAssetDic.ContainsKey(assetName) == false)
+        if (mAssetDic.ContainsKey(varAssetName) == false)
         {
-            mAssetDic.Add(assetName, assetBundle.LoadAsset(assetName));
+            mAssetDic.Add(varAssetName, assetBundle.LoadAsset(varAssetName));
         }
 
-        return mAssetDic[assetName];
+        return mAssetDic[varAssetName];
     }
 
     public void UnLoad()
@@ -128,9 +128,9 @@ public class AssetBundleEntity
         //卸载依赖
         for (int i = 0, max = mDependenceList.Count; i < max; ++i)
         {
-            if (AssetManager.GetSingleton().OtherDependence(mDependenceList[i].assetBundleName) == false)
+            if (AssetBundleManager.GetSingleton().OtherDependence(mDependenceList[i].assetBundleName) == false)
             {
-                AssetManager.GetSingleton().UnLoad(mDependenceList[i]);
+                AssetBundleManager.GetSingleton().UnLoad(mDependenceList[i]);
             }
         }
         mDependenceList.Clear();

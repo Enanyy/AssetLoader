@@ -11,11 +11,11 @@ public class AssetEntity
 
     public GameObject gameObject { get; private set; }
 
-    public AssetEntity(AssetBundleEntity assetBundle,Object assetObject, string assetName)
+    public AssetEntity(AssetBundleEntity varBundleEntity,Object varAsset, string varAssetName)
     {
-        this.assetName = assetName;
-        bundleEntity = assetBundle;
-        asset = assetObject;
+        assetName = varAssetName;
+        bundleEntity = varBundleEntity;
+        asset = varAsset;
 
         if(bundleEntity!=null)
         {
@@ -31,7 +31,7 @@ public class AssetEntity
 
     public virtual  void Destroy()
     {
-        AssetManager.GetSingleton().Destroy(this);
+        AssetBundleManager.GetSingleton().Destroy(this);
        
     }
 

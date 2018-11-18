@@ -98,7 +98,7 @@ public class AssetBundleLoadTask
     public void Load()
     {
         state = LoadStatus.Loading;
-        string tmpFullPath = AssetManager.GetAssetBundlePath() + assetBundleName;
+        string tmpFullPath = AssetBundleManager.GetAssetBundlePath() + assetBundleName;
         if (File.Exists(tmpFullPath))
         {
 
@@ -116,7 +116,7 @@ public class AssetBundleLoadTask
 
     public IEnumerator LoadAsync()
     {
-        string tmpFullPath = AssetManager.GetAssetBundlePath() + assetBundleName;
+        string tmpFullPath = AssetBundleManager.GetAssetBundlePath() + assetBundleName;
         if (File.Exists(tmpFullPath))
         {
             AssetBundleCreateRequest tmpRequest = AssetBundle.LoadFromFileAsync(tmpFullPath);
@@ -144,19 +144,19 @@ public class AssetBundleLoadTask
         mAssetLoadTaskList.Add(tmpLoadAssetTask);
 
     }
-    public void LoadFinish(AssetBundleEntity bundleEntity)
+    public void LoadFinish(AssetBundleEntity varBundleEntity)
     {
         if(assetBundle==null)
         {
-            assetBundle = bundleEntity.assetBundle;
+            assetBundle = varBundleEntity.assetBundle;
         }
         for (int i = 0; i < mAssetLoadTaskList.Count; ++i)
         {
             AssetLoadTask tmpAssetLoadTask = mAssetLoadTaskList[i];
             if (tmpAssetLoadTask.callback != null)
             {
-                UnityEngine.Object tmpObject  = bundleEntity.LoadAsset(tmpAssetLoadTask.assetName);
-                AssetEntity asset = new AssetEntity(bundleEntity, tmpObject, tmpAssetLoadTask.assetName);
+                UnityEngine.Object tmpObject  = varBundleEntity.LoadAsset(tmpAssetLoadTask.assetName);
+                AssetEntity asset = new AssetEntity(varBundleEntity, tmpObject, tmpAssetLoadTask.assetName);
 
                 tmpAssetLoadTask.callback(asset);
             }
