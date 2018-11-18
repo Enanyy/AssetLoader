@@ -156,9 +156,7 @@ public class AssetBundleManager  {
     {
         if (varLoadTask == null) { return; }
 
-
         string tmpAssetBundleName = varLoadTask.assetBundleName.ToLower();
-
 
         if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
         {
@@ -166,12 +164,9 @@ public class AssetBundleManager  {
 
             AssetBundleEntity tmpBundleEntity = new AssetBundleEntity(tmpAssetBundleName, tmpAssetBundle);
 
-
-
             mAssetBundleDic.Add(tmpAssetBundleName, tmpBundleEntity);
         }
       
-
         varLoadTask.LoadFinish(mAssetBundleDic[tmpAssetBundleName]);
 
     }
@@ -216,8 +211,7 @@ public class AssetBundleManager  {
             }
 
             tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
-           
-          
+                   
             return tmpLoadTask;
 		}
 
@@ -229,7 +223,6 @@ public class AssetBundleManager  {
             return tmpLoadTask;
         }
 
-
 		string[] tmpDependences = GetAllDependencies (varAssetBundleName);
         if (tmpDependences != null)
         {
@@ -240,8 +233,7 @@ public class AssetBundleManager  {
                 if (!mAssetBundleDic.ContainsKey(tmpDependentAssetBundleName) && GetLoadTask(tmpDependentAssetBundleName) == null)
                 {
                     AssetBundleLoadTask tmpDependenceLoadTask = new AssetBundleLoadTask(tmpDependentAssetBundleName);
-           
-                   
+                             
                     mAssetBundleLoadTaskQueue.Enqueue(tmpDependenceLoadTask);
                 }
             }
@@ -340,17 +332,13 @@ public class AssetBundleManager  {
         }
         Debug.Log("UnLoad:"+ varBundleEntity.assetBundleName);
 
-
         string tmpAssetBundleName = varBundleEntity.assetBundleName.ToLower();
 	
         //先移除
 		mAssetBundleDic.Remove (tmpAssetBundleName);
 
-
         //卸载本身以及单独的依赖
-        varBundleEntity.UnLoad();
-
-    
+        varBundleEntity.UnLoad(); 
     }
 
     public bool OtherDependence(string varAssetBundleName)
@@ -386,7 +374,6 @@ public class AssetBundleManager  {
 
         Array.Clear(tmpAssetBundleArray, 0, tmpAssetBundleArray.Length);
         tmpAssetBundleArray = null;
-
 
         mAssetBundleDic.Clear ();
 

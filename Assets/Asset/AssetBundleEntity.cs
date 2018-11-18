@@ -24,8 +24,7 @@ public class AssetBundleEntity
 	{
 		assetBundleName = varAssetBundleName;
 		assetBundle =varAssetbundle;
-	
-      
+	  
 		AddDependence ();
 	}
 
@@ -65,7 +64,6 @@ public class AssetBundleEntity
             {
                 for (int i = 0, max = tmpDependencesArray.Length; i < max; ++i)
                 {
-
                     string tmpDependence = tmpDependencesArray[i].ToLower();
 
                     AssetBundleEntity tmpBundleEntity = AssetBundleManager.GetSingleton().GetAssetBundle(tmpDependence);
