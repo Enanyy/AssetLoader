@@ -49,26 +49,26 @@ public enum LoadStatus
     Loaded,
     Cancel,
 }
-public class AssetLoadTask:IPool<AssetLoadTask>
+public class AssetLoadTask
 {
   
     public string assetName { get; private set; }
     public Action<AssetEntity> callback { get; private set; }
 
     public AssetLoadTask() { }
-    public void Init(string varAssetName, Action<AssetEntity> varCallback)
+    public AssetLoadTask(string varAssetName, Action<AssetEntity> varCallback)
     {
         assetName = varAssetName;
         callback = varCallback;
     }
-    public override void Clear()
+    public void Clear()
     {
         assetName = null;
         callback = null;
     }
 }
 
-public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
+public class AssetBundleLoadTask
 {
     
 
@@ -86,7 +86,7 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
        
     }
 
-    public void Init(string varAssetBundleName)
+    public AssetBundleLoadTask(string varAssetBundleName)
     {
         assetBundleName = varAssetBundleName;
       
@@ -139,8 +139,8 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
 
     public void AddAssetLoadTask(string varAssetName, Action<AssetEntity> varCallback)
     {
-        AssetLoadTask tmpLoadAssetTask = AssetLoadTask.Create();
-        tmpLoadAssetTask.Init(varAssetName, varCallback);
+        AssetLoadTask tmpLoadAssetTask = new AssetLoadTask(varAssetName, varCallback);
+
         mAssetLoadTaskList.Add(tmpLoadAssetTask);
 
     }
@@ -161,16 +161,11 @@ public class AssetBundleLoadTask:IPool<AssetBundleLoadTask>
                 tmpAssetLoadTask.callback(asset);
             }
             tmpAssetLoadTask.Clear();
-            AssetLoadTask.Recycle(tmpAssetLoadTask);
+           
         }
         mAssetLoadTaskList.Clear();
     }
 
-    public override void Clear()
-    {
-        assetBundleName = null;
-        assetBundle = null;
-        state = LoadStatus.UnLoad;
-    }
+  
 
 }

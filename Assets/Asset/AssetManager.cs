@@ -62,7 +62,7 @@ public class AssetManager : MonoBehaviour {
 
 			if (tmpLoadTask == null) 
 			{
-                AssetBundleLoadTask.Recycle(mAssetBundleLoadTaskQueue.Dequeue ());
+                mAssetBundleLoadTaskQueue.Dequeue ();
 
 				return;
 			} 
@@ -78,7 +78,7 @@ public class AssetManager : MonoBehaviour {
                    
                     tmpLoadTask.LoadFinish(mAssetBundleDic[tmpAssetBundleName]);
 
-                    AssetBundleLoadTask.Recycle(mAssetBundleLoadTaskQueue.Dequeue ());
+                    mAssetBundleLoadTaskQueue.Dequeue ();
 
 
                     return;
@@ -86,7 +86,7 @@ public class AssetManager : MonoBehaviour {
 
 				if (tmpLoadTask.state == LoadStatus.Cancel) {
 
-                    AssetBundleLoadTask.Recycle(mAssetBundleLoadTaskQueue.Dequeue ());
+                    mAssetBundleLoadTaskQueue.Dequeue ();
 					return;
 				}
 				else if (tmpLoadTask.state == LoadStatus.UnLoad) 
@@ -114,7 +114,7 @@ public class AssetManager : MonoBehaviour {
 					
                     OnAssetBundleLoadTaskFinish(tmpLoadTask);
 
-                    AssetBundleLoadTask.Recycle( mAssetBundleLoadTaskQueue.Dequeue ());
+                    mAssetBundleLoadTaskQueue.Dequeue ();
 
 					//Debug.Log ("LoadTask Count:" + mLoadingAssetQueue.Count);
 				}
@@ -161,8 +161,8 @@ public class AssetManager : MonoBehaviour {
         {
             AssetBundle tmpAssetBundle = varLoadTask.assetBundle;
 
-            AssetBundleEntity tmpBundleEntity = AssetBundleEntity.Create();
-            tmpBundleEntity.Init(tmpAssetBundleName, tmpAssetBundle);
+            AssetBundleEntity tmpBundleEntity = new AssetBundleEntity(tmpAssetBundleName, tmpAssetBundle);
+
 
 
             mAssetBundleDic.Add(tmpAssetBundleName, tmpBundleEntity);
@@ -193,8 +193,8 @@ public class AssetManager : MonoBehaviour {
                 AssetEntity asset = new AssetEntity(null, tmpObj, varAssetName);
                 varCallback(asset);
             }
-            tmpLoadTask = new AssetBundleLoadTask();
-            tmpLoadTask.Init(tmpAssetBundleName);
+            tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
+
             tmpLoadTask.state = LoadStatus.Loaded;
 
             return tmpLoadTask;
@@ -202,25 +202,24 @@ public class AssetManager : MonoBehaviour {
         }
 
 		if (mAssetBundleDic.ContainsKey(varAssetBundleName)) {
-
-            AssetBundleEntity tmpBundleEntity =  mAssetBundleDic[tmpAssetBundleName];
-
-            UnityEngine.Object tmpObject = null;
-            if (tmpBundleEntity != null && tmpBundleEntity.assetBundle != null)
-            {
-                 tmpObject = tmpBundleEntity.assetBundle.LoadAsset(varAssetName);
-            }
+       
             if(varCallback!=null)
             {
+                AssetBundleEntity tmpBundleEntity = mAssetBundleDic[tmpAssetBundleName];
+
+                UnityEngine.Object tmpObject = null;
+                if (tmpBundleEntity != null)
+                {
+                    tmpObject = tmpBundleEntity.LoadAsset(varAssetName);
+                }
                 AssetEntity asset = new AssetEntity(tmpBundleEntity, tmpObject, varAssetName);
 
                 varCallback(asset);
             }
 
-            tmpLoadTask =  AssetBundleLoadTask.Create();
+            tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
            
-            AssetBundleLoadTask.Recycle(tmpLoadTask);
-
+          
             return tmpLoadTask;
 		}
 
@@ -242,16 +241,16 @@ public class AssetManager : MonoBehaviour {
 
                 if (!mAssetBundleDic.ContainsKey(tmpDependentAssetBundleName) && GetLoadTask(tmpDependentAssetBundleName) == null)
                 {
-                    AssetBundleLoadTask tmpDependenceLoadTask = AssetBundleLoadTask.Create();
-                    tmpDependenceLoadTask.Init(tmpDependentAssetBundleName);
+                    AssetBundleLoadTask tmpDependenceLoadTask = new AssetBundleLoadTask(tmpDependentAssetBundleName);
+           
                    
                     mAssetBundleLoadTaskQueue.Enqueue(tmpDependenceLoadTask);
                 }
             }
         }
 			
-		tmpLoadTask = AssetBundleLoadTask.Create ();
-        tmpLoadTask.Init(tmpAssetBundleName);
+		tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
+
         tmpLoadTask.AddAssetLoadTask(varAssetName, varCallback);
 
         mAssetBundleLoadTaskQueue.Enqueue (tmpLoadTask);
@@ -274,7 +273,7 @@ public class AssetManager : MonoBehaviour {
 
             if(tmpBundleEntity.referenceCount == 0)
             {
-                UnLoad(varReference.bundleEntity.assetBundleName);
+                UnLoad(varReference.bundleEntity);
             }
         }
         
@@ -335,28 +334,24 @@ public class AssetManager : MonoBehaviour {
  
 
 
-    public void UnLoad(string varAssetBundleName)
+    public void UnLoad(AssetBundleEntity bundleEntity)
 	{
-        if(string.IsNullOrEmpty(varAssetBundleName))
+        if(bundleEntity == null)
         {
             return;
         }
-        Debug.Log("UnLoad:"+ varAssetBundleName);
+        Debug.Log("UnLoad:"+ bundleEntity.assetBundleName);
 
 
-        string tmpAssetBundleName = varAssetBundleName.ToLower();
-		AssetBundleEntity tmpLoadedAssetBundle = GetAssetBundle (tmpAssetBundleName);
-		if (tmpLoadedAssetBundle == null) {
-            return;
-		}
+        string tmpAssetBundleName = bundleEntity.assetBundleName.ToLower();
+	
         //先移除
 		mAssetBundleDic.Remove (tmpAssetBundleName);
 
-       
-        //卸载本身以及单独的依赖
-        tmpLoadedAssetBundle.UnLoad();
 
-        AssetBundleEntity.Recycle(tmpLoadedAssetBundle);
+        //卸载本身以及单独的依赖
+        bundleEntity.UnLoad();
+
     
     }
 
@@ -387,7 +382,8 @@ public class AssetManager : MonoBehaviour {
         mAssetBundleDic.Keys.CopyTo(tmpAssetBundleArray, 0);
         for (int i = 0,  max = tmpAssetBundleArray.Length; i <max; ++i)
         {
-            UnLoad(tmpAssetBundleArray[i]);
+            AssetBundleEntity tmpBundleEntity = GetAssetBundle(tmpAssetBundleArray[i]);
+            UnLoad(tmpBundleEntity);
         }
 
         Array.Clear(tmpAssetBundleArray, 0, tmpAssetBundleArray.Length);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-public class AssetBundleEntity:IPool<AssetBundleEntity>
+public class AssetBundleEntity
 {
     public string assetBundleName { get; private set; }
     public AssetBundle assetBundle { get; private set; }
@@ -20,7 +20,7 @@ public class AssetBundleEntity:IPool<AssetBundleEntity>
 
     public AssetBundleEntity() { }
 
-	public void Init(string varAssetBundleName,AssetBundle varAssetbundle)
+	public AssetBundleEntity(string varAssetBundleName,AssetBundle varAssetbundle)
 	{
 		assetBundleName = varAssetBundleName;
 		assetBundle =varAssetbundle;
@@ -130,7 +130,7 @@ public class AssetBundleEntity:IPool<AssetBundleEntity>
         {
             if (AssetManager.GetSingleton().OtherDependence(mDependenceList[i].assetBundleName) == false)
             {
-                AssetManager.GetSingleton().UnLoad(mDependenceList[i].assetBundleName);
+                AssetManager.GetSingleton().UnLoad(mDependenceList[i]);
             }
         }
         mDependenceList.Clear();

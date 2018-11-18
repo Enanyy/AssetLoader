@@ -7,24 +7,25 @@ public class AssetEntity
   
     public string assetName { get; private set; }
 
-    public Object assetObject { get; private set; }
+    public Object asset { get; private set; }
 
     public GameObject gameObject { get; private set; }
 
     public AssetEntity(AssetBundleEntity assetBundle,Object assetObject, string assetName)
     {
         this.assetName = assetName;
-        this.bundleEntity = assetBundle;
-        this.assetObject = assetObject;
+        bundleEntity = assetBundle;
+        asset = assetObject;
 
-        if(this.bundleEntity!=null)
+        if(bundleEntity!=null)
         {
-            this.bundleEntity.AddReference(this);
+            bundleEntity.AddReference(this);
         }
+        gameObject = Object.Instantiate(asset) as GameObject;
     }
     ~AssetEntity()
     {
-        Destroy();
+        //Destroy();
     }
  
 
