@@ -3,44 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-public class IPool<T> where T : IPool<T>,new()
-{
-    public bool isPool { get; private set; }
-    private static List<T> mCacheList;
-    public static T Create()
-    {
-        if (mCacheList == null)
-        {
-            mCacheList = new List<T>();
-        }
 
-        T t;
-        if (mCacheList.Count > 0)
-        {
-            t = mCacheList[0];
-            mCacheList.RemoveAt(0);
-        }
-        else
-        {
-            t = new T();
-        }
-        t.isPool = false;
-        return t;
-    }
-    public static void Recycle(T t)
-    {
-        if (t != null && mCacheList.Contains(t) == false)
-        {
-            t.isPool = true;
-            mCacheList.Add(t);
-        }
-    }
-
-    public virtual void Clear()
-    {
-
-    }
-}
 
 public enum LoadStatus
 {
@@ -54,18 +17,25 @@ public class AssetLoadTask
 {
   
     public string assetName { get; private set; }
-    public Action<AssetEntity> callback { get; private set; }
+    public Action<AssetEntity> assetCallback { get; private set; }
+    public Action<AssetBundleEntity> assetBundleCallback { get; private set; }
 
     public AssetLoadTask() { }
     public AssetLoadTask(string varAssetName, Action<AssetEntity> varCallback)
     {
         assetName = varAssetName;
-        callback = varCallback;
+        assetCallback = varCallback;
+    }
+    public AssetLoadTask(string varAssetName, Action<AssetBundleEntity> varCallback)
+    {
+        assetName = varAssetName;
+        assetBundleCallback = varCallback;
     }
     public void Clear()
     {
         assetName = null;
-        callback = null;
+        assetCallback = null;
+        assetBundleCallback = null;
     }
 }
 
@@ -151,6 +121,13 @@ public class AssetBundleLoadTask
         mAssetLoadTaskList.Add(tmpLoadAssetTask);
 
     }
+    public void AddAssetLoadTask(string varAssetName, Action<AssetBundleEntity> varCallback)
+    {
+        AssetLoadTask tmpLoadAssetTask = new AssetLoadTask(varAssetName, varCallback);
+
+        mAssetLoadTaskList.Add(tmpLoadAssetTask);
+
+    }
     public void LoadFinish(AssetBundleEntity varBundleEntity)
     {
         if(assetBundle==null)
@@ -160,12 +137,17 @@ public class AssetBundleLoadTask
         for (int i = 0; i < mAssetLoadTaskList.Count; ++i)
         {
             AssetLoadTask tmpAssetLoadTask = mAssetLoadTaskList[i];
-            if (tmpAssetLoadTask.callback != null)
+            if (tmpAssetLoadTask.assetBundleCallback != null)
+            {
+                tmpAssetLoadTask.assetBundleCallback(varBundleEntity);
+            }
+            if (tmpAssetLoadTask.assetCallback != null)
             {            
                 AssetEntity tmpAsset = new AssetEntity(varBundleEntity,  tmpAssetLoadTask.assetName);
 
-                tmpAssetLoadTask.callback(tmpAsset);
+                tmpAssetLoadTask.assetCallback(tmpAsset);
             }
+            
             tmpAssetLoadTask.Clear();
            
         }

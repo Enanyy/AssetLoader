@@ -36,6 +36,7 @@ public class AssetEntity
         gameObject = Object.Instantiate(asset) as GameObject;
     }
 
+   
     ~AssetEntity()
     {
         Destroy();

@@ -66,7 +66,7 @@ public class AssetBundleEntity
                 {
                     string tmpDependence = tmpDependencesArray[i].ToLower();
 
-                    AssetBundleEntity tmpBundleEntity = AssetBundleManager.GetSingleton().GetAssetBundle(tmpDependence);
+                    AssetBundleEntity tmpBundleEntity = AssetBundleManager.GetSingleton().GetAssetBundleEntity(tmpDependence);
 
                     if (tmpBundleEntity != null && mDependenceList.Contains(tmpBundleEntity) == false)
                     {

@@ -35,9 +35,9 @@ public class AssetBundleManager  {
 
     public LoadType loadType = LoadType.Async;
 
-    public void Init()
+    public void Init(string varAssetManifestName)
 	{
-		string tmpAssetManifest = GetAssetBundlePath () + "StreamingAssets";
+        string tmpAssetManifest = GetAssetBundlePath() + varAssetManifestName;
 		if (File.Exists (tmpAssetManifest)) {
 
 			mManifestAssetBundle = AssetBundle.LoadFromFile (tmpAssetManifest);
@@ -171,6 +171,59 @@ public class AssetBundleManager  {
 
     }
 
+    public AssetBundleLoadTask Load(string varAssetBundleName,System.Action<AssetBundleEntity> varCallback)
+    {
+        string tmpAssetBundleName = varAssetBundleName.ToLower();
+
+        AssetBundleLoadTask tmpLoadTask = null;
+ 
+        if (mAssetBundleDic.ContainsKey(varAssetBundleName))
+        {
+            if (varCallback != null)
+            {
+                AssetBundleEntity tmpBundleEntity = mAssetBundleDic[tmpAssetBundleName];
+
+                varCallback(tmpBundleEntity);
+            }
+
+            tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
+
+            return tmpLoadTask;
+        }
+
+        tmpLoadTask = GetLoadTask(tmpAssetBundleName);
+
+        if (tmpLoadTask != null)
+        {
+            tmpLoadTask.AddAssetLoadTask(varAssetBundleName, varCallback);
+            return tmpLoadTask;
+        }
+
+        string[] tmpDependences = GetAllDependencies(varAssetBundleName);
+        if (tmpDependences != null)
+        {
+            for (int i = 0; i < tmpDependences.Length; ++i)
+            {
+                string tmpDependentAssetBundleName = tmpDependences[i].ToLower();
+
+                if (!mAssetBundleDic.ContainsKey(tmpDependentAssetBundleName) && GetLoadTask(tmpDependentAssetBundleName) == null)
+                {
+                    AssetBundleLoadTask tmpDependenceLoadTask = new AssetBundleLoadTask(tmpDependentAssetBundleName);
+
+                    mAssetBundleLoadTaskQueue.Enqueue(tmpDependenceLoadTask);
+                }
+            }
+        }
+
+        tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
+
+        tmpLoadTask.AddAssetLoadTask(varAssetBundleName, varCallback);
+
+        mAssetBundleLoadTaskQueue.Enqueue(tmpLoadTask);
+
+        return tmpLoadTask;
+    }
+
     /// <summary>
     /// AssetBundle name is "Assets/..."
     /// </summary>
@@ -198,54 +251,19 @@ public class AssetBundleManager  {
             return tmpLoadTask;
 #endif
         }
+        return Load(varAssetBundleName, (varAssetBundleEntity) => {
 
-		if (mAssetBundleDic.ContainsKey(varAssetBundleName)) {
-       
-            if(varCallback!=null)
+            if(varAssetBundleEntity!=null)
             {
-                AssetBundleEntity tmpBundleEntity = mAssetBundleDic[tmpAssetBundleName];
-         
-                AssetEntity asset = new AssetEntity(tmpBundleEntity,  varAssetName);
-
-                varCallback(asset);
-            }
-
-            tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
-                   
-            return tmpLoadTask;
-		}
-
-        tmpLoadTask = GetLoadTask(tmpAssetBundleName);
-
-        if (tmpLoadTask!=null)
-        {      
-            tmpLoadTask.AddAssetLoadTask(varAssetName, varCallback);
-            return tmpLoadTask;
-        }
-
-		string[] tmpDependences = GetAllDependencies (varAssetBundleName);
-        if (tmpDependences != null)
-        {
-            for (int i = 0; i < tmpDependences.Length; ++i)
-            {
-                string tmpDependentAssetBundleName = tmpDependences[i].ToLower();
-
-                if (!mAssetBundleDic.ContainsKey(tmpDependentAssetBundleName) && GetLoadTask(tmpDependentAssetBundleName) == null)
+                if (varCallback != null)
                 {
-                    AssetBundleLoadTask tmpDependenceLoadTask = new AssetBundleLoadTask(tmpDependentAssetBundleName);
-                             
-                    mAssetBundleLoadTaskQueue.Enqueue(tmpDependenceLoadTask);
+                    AssetEntity asset = new AssetEntity(varAssetBundleEntity, varAssetName);
+                    varCallback(asset);
                 }
             }
-        }
-			
-		tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
+        });
 
-        tmpLoadTask.AddAssetLoadTask(varAssetName, varCallback);
 
-        mAssetBundleLoadTaskQueue.Enqueue (tmpLoadTask);
-
-		return tmpLoadTask;
 	}
 
 
@@ -269,7 +287,7 @@ public class AssetBundleManager  {
         
     }
 
-	public AssetBundleEntity GetAssetBundle(string varAssetbundleName)
+	public AssetBundleEntity GetAssetBundleEntity(string varAssetbundleName)
 	{
 		AssetBundleEntity tmpBundleEntity = null;
 
@@ -368,7 +386,7 @@ public class AssetBundleManager  {
         mAssetBundleDic.Keys.CopyTo(tmpAssetBundleArray, 0);
         for (int i = 0,  max = tmpAssetBundleArray.Length; i <max; ++i)
         {
-            AssetBundleEntity tmpBundleEntity = GetAssetBundle(tmpAssetBundleArray[i]);
+            AssetBundleEntity tmpBundleEntity = GetAssetBundleEntity(tmpAssetBundleArray[i]);
             UnLoad(tmpBundleEntity);
         }
 

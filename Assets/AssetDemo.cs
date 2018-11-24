@@ -10,7 +10,7 @@ public class AssetDemo : MonoBehaviour {
     AssetEntity go2;
     void Awake()
     {
-        AssetBundleManager.GetSingleton().Init();
+        AssetBundleManager.GetSingleton().Init("StreamingAssets");
     }
 	// Use this for initialization
 	void Start () {
