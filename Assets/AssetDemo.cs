@@ -18,27 +18,18 @@ public class AssetDemo : MonoBehaviour {
 
         string plane = "assets/r/Plane.prefab";
 
-        
 
-        AssetBundleManager.GetSingleton().Load(plane, plane, (varGo) => {
+        go0 = new AssetEntity();
+        go0.LoadAsset(plane, plane);
 
-            if(varGo != null)
-            {
-                go0 = varGo;
-            }
-        });
+       
 
         
         string cube = "assets/r/Cube.prefab";
-        AssetBundleManager.GetSingleton().Load(cube, cube, (varGo) =>
-        {
+        go1 = new AssetEntity();
+        go1.LoadAsset(cube, cube);
 
-            if (varGo!=null)
-            {
-                //go1 = AssetManager.GetSingleton().Instantiate(cube, cube, varGo) as GameObject;
-            }
-        });
-       
+
     }
 
     List<GameObject> mList = new List<GameObject>();

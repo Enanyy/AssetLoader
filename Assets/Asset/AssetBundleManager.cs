@@ -31,7 +31,7 @@ public class AssetBundleManager  {
 		
 	Queue<AssetBundleLoadTask> mAssetBundleLoadTaskQueue = new Queue<AssetBundleLoadTask>();
 
-    int mAssetMode = 0;
+   public int assetMode { get; private set; }
 
     public LoadType loadType = LoadType.Async;
 
@@ -51,7 +51,7 @@ public class AssetBundleManager  {
 			}
 		}
 
-        mAssetMode = PlayerPrefs.GetInt("assetmode");
+        assetMode = PlayerPrefs.GetInt("assetmode");
     }
 
 
@@ -224,47 +224,6 @@ public class AssetBundleManager  {
         return tmpLoadTask;
     }
 
-    /// <summary>
-    /// AssetBundle name is "Assets/..."
-    /// </summary>
-    /// <param name="varAssetBundleName">Variable asset bundle name.</param>
-    /// <param name="varCallback">Variable callback.</param>
-    public AssetBundleLoadTask Load(string varAssetBundleName, string varAssetName, System.Action<AssetEntity> varCallback)
-	{
-		string tmpAssetBundleName = varAssetBundleName.ToLower ();
-
-		AssetBundleLoadTask tmpLoadTask = null;
-        if (mAssetMode == 0)
-        {
-#if UNITY_EDITOR
-            UnityEngine.Object tmpAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(varAssetName);
-
-            if (varCallback != null)
-            {
-                AssetEntity asset = new AssetEntity( tmpAsset, varAssetName);
-                varCallback(asset);
-            }
-            tmpLoadTask = new AssetBundleLoadTask(tmpAssetBundleName);
-
-            tmpLoadTask.state = LoadStatus.Finish;
-
-            return tmpLoadTask;
-#endif
-        }
-        return Load(varAssetBundleName, (varAssetBundleEntity) => {
-
-            if(varAssetBundleEntity!=null)
-            {
-                if (varCallback != null)
-                {
-                    AssetEntity asset = new AssetEntity(varAssetBundleEntity, varAssetName);
-                    varCallback(asset);
-                }
-            }
-        });
-
-
-	}
 
 
     public void Destroy(AssetEntity varReference)
@@ -298,7 +257,7 @@ public class AssetBundleManager  {
 
 	public void LoadScene(string varAssetBundleName,System.Action varCallback)
 	{
-        Load(varAssetBundleName, "", (varGo) => {
+        Load(varAssetBundleName,  (varGo) => {
 
             if(varCallback!=null)
             {

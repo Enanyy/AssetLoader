@@ -13,31 +13,7 @@ public enum LoadStatus
     Cancel,
     Error,
 }
-public class AssetLoadTask
-{
-  
-    public string assetName { get; private set; }
-    public Action<AssetEntity> assetCallback { get; private set; }
-    public Action<AssetBundleEntity> assetBundleCallback { get; private set; }
 
-    public AssetLoadTask() { }
-    public AssetLoadTask(string varAssetName, Action<AssetEntity> varCallback)
-    {
-        assetName = varAssetName;
-        assetCallback = varCallback;
-    }
-    public AssetLoadTask(string varAssetName, Action<AssetBundleEntity> varCallback)
-    {
-        assetName = varAssetName;
-        assetBundleCallback = varCallback;
-    }
-    public void Clear()
-    {
-        assetName = null;
-        assetCallback = null;
-        assetBundleCallback = null;
-    }
-}
 
 public class AssetBundleLoadTask
 {
@@ -51,7 +27,7 @@ public class AssetBundleLoadTask
     /// <summary>
     /// 加载AssetBundle完成需要Load的资源
     /// </summary>
-    private List<AssetLoadTask> mAssetLoadTaskList = new List<AssetLoadTask>();
+    private List<Action<AssetBundleEntity>> mAssetLoadTaskList = new List<Action<AssetBundleEntity>>();
 
     public AssetBundleLoadTask()
     {
@@ -114,19 +90,13 @@ public class AssetBundleLoadTask
         }
     }
 
-    public void AddAssetLoadTask(string varAssetName, Action<AssetEntity> varCallback)
-    {
-        AssetLoadTask tmpLoadAssetTask = new AssetLoadTask(varAssetName, varCallback);
 
-        mAssetLoadTaskList.Add(tmpLoadAssetTask);
-
-    }
     public void AddAssetLoadTask(string varAssetName, Action<AssetBundleEntity> varCallback)
     {
-        AssetLoadTask tmpLoadAssetTask = new AssetLoadTask(varAssetName, varCallback);
-
-        mAssetLoadTaskList.Add(tmpLoadAssetTask);
-
+        if (varCallback != null)
+        {
+            mAssetLoadTaskList.Add(varCallback);
+        }
     }
     public void LoadFinish(AssetBundleEntity varBundleEntity)
     {
@@ -136,20 +106,11 @@ public class AssetBundleLoadTask
         }
         for (int i = 0; i < mAssetLoadTaskList.Count; ++i)
         {
-            AssetLoadTask tmpAssetLoadTask = mAssetLoadTaskList[i];
-            if (tmpAssetLoadTask.assetBundleCallback != null)
+            var tmpAssetLoadTask = mAssetLoadTaskList[i];
+            if (tmpAssetLoadTask != null)
             {
-                tmpAssetLoadTask.assetBundleCallback(varBundleEntity);
-            }
-            if (tmpAssetLoadTask.assetCallback != null)
-            {            
-                AssetEntity tmpAsset = new AssetEntity(varBundleEntity,  tmpAssetLoadTask.assetName);
-
-                tmpAssetLoadTask.assetCallback(tmpAsset);
-            }
-            
-            tmpAssetLoadTask.Clear();
-           
+                tmpAssetLoadTask(varBundleEntity);
+            } 
         }
         mAssetLoadTaskList.Clear();
     }
