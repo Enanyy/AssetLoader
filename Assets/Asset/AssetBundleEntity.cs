@@ -51,6 +51,10 @@ public class AssetBundleEntity
                 mReferenceList.RemoveAt(i);
             }
         }
+        if (referenceCount == 0)
+        {
+           AssetBundleManager.GetSingleton().UnLoad(this);
+        }
     }
 
 

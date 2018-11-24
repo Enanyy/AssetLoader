@@ -225,27 +225,6 @@ public class AssetBundleManager  {
     }
 
 
-
-    public void Destroy(AssetEntity varReference)
-    {
-        if (varReference == null || varReference.bundleEntity == null)
-        {
-            return;
-        }
-      
-        AssetBundleEntity tmpBundleEntity = varReference.bundleEntity;
-        if (tmpBundleEntity != null)
-        {
-            tmpBundleEntity.RemoveReference(varReference);
-
-            if(tmpBundleEntity.referenceCount == 0)
-            {
-                UnLoad(varReference.bundleEntity);
-            }
-        }
-        
-    }
-
 	public AssetBundleEntity GetAssetBundleEntity(string varAssetbundleName)
 	{
 		AssetBundleEntity tmpBundleEntity = null;

@@ -109,7 +109,10 @@ public class AssetEntity
 
     public virtual void Destroy()
     {
-        AssetBundleManager.GetSingleton().Destroy(this);
+       if(bundleEntity!=null)
+        {
+            bundleEntity.RemoveReference(this);
+        }
         Object.Destroy(gameObject);
     }
 
