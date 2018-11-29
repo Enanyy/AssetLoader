@@ -10,7 +10,7 @@ public enum LoadType
     Async,
 }
 
-public class AssetBundleManager  {
+public class AssetBundleManager:MonoBehaviour  {
 
     #region GetSingleton
     private static AssetBundleManager mInstance;
@@ -18,7 +18,9 @@ public class AssetBundleManager  {
     {
         if(mInstance == null)
         {
-            mInstance = new AssetBundleManager();
+            GameObject go = new GameObject(typeof(AssetBundleManager).Name);
+            mInstance = go.AddComponent<AssetBundleManager>();
+            DontDestroyOnLoad(go);
         }
         return mInstance;
     }
@@ -31,9 +33,10 @@ public class AssetBundleManager  {
 		
 	Queue<AssetBundleLoadTask> mAssetBundleLoadTaskQueue = new Queue<AssetBundleLoadTask>();
 
-   public int assetMode { get; private set; }
+    public int assetMode { get; private set; }
 
-    public LoadType loadType = LoadType.Async;
+
+    private  string mAssetBundlePath;
 
     public void Init(string varAssetManifestName)
 	{
@@ -55,7 +58,7 @@ public class AssetBundleManager  {
     }
 
 
-	public void Update()
+	 void Update()
 	{
 		if (mAssetBundleLoadTaskQueue.Count > 0) {
 
@@ -94,22 +97,14 @@ public class AssetBundleManager  {
 				}
 				else if (tmpLoadTask.state == LoadStatus.Wait) 
 				{
-                    if (loadType == LoadType.Sync)
-                    {
-                        tmpLoadTask.LoadSync();
-                    }
-                    else
-                    {
-                        tmpLoadTask.LoadAsync();
-                    }
-					//Debug.Log("Start Load:"+tmpLoadTask.mAssetBundleName);
 
+                    StartCoroutine( tmpLoadTask.LoadAsync());
+                    
 					return;
 				} 
 				else if (tmpLoadTask.state ==LoadStatus.Loading) 
 				{
-                    tmpLoadTask.CheckLoadAsync();
-
+                   
 					return;
 				} 
 				else if (tmpLoadTask.state == LoadStatus.Finish)
@@ -312,13 +307,29 @@ public class AssetBundleManager  {
     }
 
 
-	public static string GetAssetBundlePath()
+	public  string GetAssetBundlePath()
 	{
-		return Application.dataPath +"/../StreamingAssets/";
-	}
-   
+        if (string.IsNullOrEmpty(mAssetBundlePath))
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                mAssetBundlePath = Application.dataPath + "!/assets/StreamingAssets/";
+            }
+            else if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                mAssetBundlePath = Application.persistentDataPath + "/StreamingAssets/";
+            }
+            else
+            {
+                mAssetBundlePath = Application.dataPath + "/../StreamingAssets/";
+            }
+        }
+        return mAssetBundlePath;
 
-	public void Destroy()
+    }
+
+
+    public void Destroy()
 	{
         string[] tmpAssetBundleArray = new string[mAssetBundleDic.Count];
         mAssetBundleDic.Keys.CopyTo(tmpAssetBundleArray, 0);

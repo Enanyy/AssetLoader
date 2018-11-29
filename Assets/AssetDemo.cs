@@ -35,7 +35,7 @@ public class AssetDemo : MonoBehaviour {
     List<GameObject> mList = new List<GameObject>();
     void Update()
     {
-        AssetBundleManager.GetSingleton().Update();
+       
 
         if(Input.GetKeyDown(KeyCode.Keypad0))
         {

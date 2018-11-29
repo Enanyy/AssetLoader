@@ -103,7 +103,7 @@ public class AssetEntity
    
     ~AssetEntity()
     {
-        Destroy();
+        //Destroy();
     }
 
 

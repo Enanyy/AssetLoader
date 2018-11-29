@@ -21,9 +21,7 @@ public class AssetBundleLoadTask
     public string assetBundleName { get; private set; }
     public LoadStatus state { get; set; }
     public AssetBundle assetBundle { get; private set; }
-    private AssetBundleCreateRequest mRequest;
-
-
+   
     /// <summary>
     /// 加载AssetBundle完成需要Load的资源
     /// </summary>
@@ -41,54 +39,35 @@ public class AssetBundleLoadTask
         state = LoadStatus.Wait;
         assetBundle = null;
     }
-   
 
-    public void LoadSync()
+    public IEnumerator LoadAsync()
     {
+        string tmpFullPath = AssetBundleManager.GetSingleton().GetAssetBundlePath() + assetBundleName;
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            tmpFullPath = Uri.EscapeUriString(tmpFullPath);
+        }
+
         state = LoadStatus.Loading;
-        string tmpFullPath = AssetBundleManager.GetAssetBundlePath() + assetBundleName;
-        if (File.Exists(tmpFullPath))
+        using (WWW www = new WWW(tmpFullPath))
         {
-            assetBundle = AssetBundle.LoadFromFile(tmpFullPath);
+            yield return www;
 
-            state = LoadStatus.Finish;
-        }
-        else
-        {
-            Debug.Log("Can not find file:" + tmpFullPath);
-            state = LoadStatus.Error;
-        }
-    }
-
-    public void LoadAsync()
-    {
-        string tmpFullPath = AssetBundleManager.GetAssetBundlePath() + assetBundleName;
-        if (File.Exists(tmpFullPath))
-        {
-            mRequest = AssetBundle.LoadFromFileAsync(tmpFullPath);
-            state = LoadStatus.Loading;         
-        }
-        else
-        {
-            state = LoadStatus.Error;
-        }
-    }
-
-    public void CheckLoadAsync()
-    {
-        if(mRequest!=null)
-        {
-            if(mRequest.isDone)
+            if (www.isDone && www.assetBundle)
             {
-                assetBundle = mRequest.assetBundle;
+                assetBundle = www.assetBundle;
                 state = LoadStatus.Finish;
             }
+            else
+            {
+                Debug.LogError(assetBundleName + ":" + www.error);
+                state = LoadStatus.Error;
+            }
         }
-        else
-        {
-            state = LoadStatus.Error;
-        }
+
     }
+
+   
 
 
     public void AddAssetLoadTask(string varAssetName, Action<AssetBundleEntity> varCallback)
