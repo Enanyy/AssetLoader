@@ -229,50 +229,6 @@ public class AssetBundleManager:MonoBehaviour  {
 		return tmpBundleEntity;
 	}
 
-	public void LoadScene(string varAssetBundleName,System.Action varCallback)
-	{
-        Load(varAssetBundleName,  (varGo) => {
-
-            if(varCallback!=null)
-            {
-                varCallback();
-            }
-        });
-	}
-
-	IEnumerator LoadSceneAsync(string varAssetBundleName,System.Action varCallback)
-	{
-		string tmpAssetBundleName = varAssetBundleName.ToLower ();
-
-		if (mAssetBundleDic.ContainsKey (tmpAssetBundleName)) {
-
-			if (varCallback != null) {
-				varCallback ();
-			}
-
-			yield break;
-		
-		}
-		string tmpScenePath = GetAssetBundlePath () + varAssetBundleName;
-		using(WWW www = new WWW ("file://" + tmpScenePath))
-		{
-			yield return www;
-
-			if (www.isDone) {
-
-				//if (www.assetBundle != null) {
-					
-				//}
-				//mAssetBundleDic.Add (tmpAssetBundleName, new LoadedAssetbundle (varAssetBundleName, AssetType.Scene, www.assetBundle));
-
-				if (varCallback != null) {
-					varCallback ();
-				}
-			}
-		}
-	}
-
- 
 
 
     public void UnLoad(AssetBundleEntity varBundleEntity)

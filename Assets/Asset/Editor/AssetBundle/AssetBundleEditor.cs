@@ -11,7 +11,6 @@ public class AssetBundleEditor : Editor
     [MenuItem("BuildAssetBundle/BuildAssets")]
     static void BuildAssets()
     {
-       
         if (Directory.Exists(mOutputPath))
         {
             Directory.Delete(mOutputPath, true);
@@ -24,6 +23,36 @@ public class AssetBundleEditor : Editor
         //打包资源
         BuildPipeline.BuildAssetBundles(mOutputPath, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
 
+    }
+    [MenuItem("BuildAssetBundle/BuildScene")]
+    static void BuildScene()
+    {      
+        //打包场景
+        string[] tmpScenes =
+        {
+            "Assets/R/Scenes/test.unity",
+        };
+        if (Directory.Exists(mOutputPath) == false)
+        {
+            Directory.CreateDirectory(mOutputPath);
+        }
+        EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", 0f);
+        for (int i = 0; i < tmpScenes.Length; i++)
+        {
+            string tmpSceneAssetbundlePath = mOutputPath + tmpScenes[i].ToLower();
+            string tmpSceneAssetbundleDir = Path.GetDirectoryName(tmpSceneAssetbundlePath);
+            if (Directory.Exists(tmpSceneAssetbundleDir) == false)
+            {
+                Directory.CreateDirectory(tmpSceneAssetbundleDir);
+            }
+
+            string[] tmpLevels = { tmpScenes[i] };
+            BuildPipeline.BuildPlayer(tmpLevels, tmpSceneAssetbundlePath, EditorUserBuildSettings.activeBuildTarget, BuildOptions.BuildAdditionalStreamedScenes);
+
+            EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", i * 1.0f / tmpScenes.Length);
+        }
+
+        EditorUtility.ClearProgressBar();
     }
 
     [MenuItem("Assets/BuildSelectAssetBundleName")]

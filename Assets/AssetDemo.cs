@@ -8,6 +8,8 @@ public class AssetDemo : MonoBehaviour {
     AssetEntity go0;
     AssetEntity go1;
     AssetEntity go2;
+    List<GameObject> mList = new List<GameObject>();
+
     void Awake()
     {
         AssetBundleManager.GetSingleton().Init("StreamingAssets");
@@ -16,37 +18,31 @@ public class AssetDemo : MonoBehaviour {
 	void Start () {
 
 
-        string plane = "assets/r/Plane.prefab";
+        string plane = "assets/r/res/Plane.prefab";
 
 
         go0 = new AssetEntity();
         go0.LoadAsset(plane, plane);
 
-       
-
-        
-        string cube = "assets/r/Cube.prefab";
+        string cube = "assets/r/res/Cube.prefab";
         go1 = new AssetEntity();
         go1.LoadAsset(cube, cube);
 
 
     }
 
-    List<GameObject> mList = new List<GameObject>();
     void Update()
     {
-       
-
         if(Input.GetKeyDown(KeyCode.Keypad0))
         {
-            //Destroy(go0);
+          
             go0.Destroy();
             go0 = null;
            
         }
         if (Input.GetKeyDown(KeyCode.Keypad1))
         {
-           // Destroy(go1);
+          
            
         }
         if (Input.GetKeyDown(KeyCode.Keypad2))
@@ -58,23 +54,22 @@ public class AssetDemo : MonoBehaviour {
             }
 
         }
-        if (Input.GetKeyDown(KeyCode.Keypad3))
+       
+    
+    }
+    private void OnGUI()
+    {
+        if (GUI.Button(new Rect(20, 20, 100, 40), "Change test scene"))
         {
-            string plane = "assets/r/Plane.prefab";
-            /*
-            AssetManager.GetSingleton().Load(plane, plane, (varGo) =>
+            AssetBundleManager.GetSingleton().Load("assets/r/scenes/test.unity", (bundleEntity) =>
             {
 
-                if (varGo)
+                if (bundleEntity != null)
                 {
-                    GameObject go = AssetManager.GetSingleton().Instantiate(plane, plane, varGo) as GameObject;
-
-                    mList.Add(go);
+                    SceneManager.LoadScene("test");
                 }
             });
-            */
         }
-    
     }
 
     private void OnApplicationQiut()
