@@ -2,13 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
-public enum LoadType
-{
-    Sync,
-    Async,
-}
+
+
 
 public class AssetBundleManager:MonoBehaviour  {
 
@@ -36,30 +32,78 @@ public class AssetBundleManager:MonoBehaviour  {
     public int assetMode { get; private set; }
 
 
-    private  string mAssetBundlePath;
+    private string mAssetBundlePath;
+
+    private bool mInited = false;
+
+    /// <summary>
+    /// 没有初始化完毕就开始加载的资源
+    /// </summary>
+    private class AssetBundleWaitTask {
+
+        public string assetBundleName;
+        public Action<AssetBundleEntity> callback;
+
+    }
+
+    private Queue<AssetBundleWaitTask> mWaitTaskQueue = new Queue<AssetBundleWaitTask>();
 
     public void Init(string varAssetManifestName)
 	{
-        string tmpAssetManifest = GetAssetBundlePath() + varAssetManifestName;
-		if (File.Exists (tmpAssetManifest)) {
-
-			mManifestAssetBundle = AssetBundle.LoadFromFile (tmpAssetManifest);
-		
-			if (mManifestAssetBundle) {
-			
-				mManifest = mManifestAssetBundle.LoadAsset ("AssetBundleManifest") as AssetBundleManifest;
-
-			    UnityEngine.Object.DontDestroyOnLoad (mManifest);
-			
-			}
-		}
+        mInited = false;
 
         assetMode = PlayerPrefs.GetInt("assetmode");
+
+        StartCoroutine(LoadManifest(varAssetManifestName));
+
+    }
+
+    private IEnumerator LoadManifest(string varAssetManifestName)
+    {
+        string tmpAssetManifestPath = GetAssetBundlePath() + varAssetManifestName;
+
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            tmpAssetManifestPath = Uri.EscapeUriString(tmpAssetManifestPath);
+        }
+
+
+        using (WWW www = new WWW(tmpAssetManifestPath))
+        {
+            yield return www;
+
+            if (www.isDone && www.assetBundle)
+            {
+                mManifestAssetBundle = www.assetBundle;
+
+                mManifest = mManifestAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+
+                DontDestroyOnLoad(mManifest);
+
+                mInited = true;
+
+                while(mWaitTaskQueue.Count >0)
+                {
+                    var waitTask = mWaitTaskQueue.Dequeue();
+                    Load(waitTask.assetBundleName, waitTask.callback);
+                }
+            }
+            else
+            {
+                Debug.LogError(varAssetManifestName + ":" + www.error);
+               
+           }
+        }
     }
 
 
-	 void Update()
+	void Update()
 	{
+        if(mInited == false)
+        {
+            return;
+        }
+
 		if (mAssetBundleLoadTaskQueue.Count > 0) {
 
 			AssetBundleLoadTask tmpLoadTask = mAssetBundleLoadTaskQueue.Peek ();
@@ -89,22 +133,19 @@ public class AssetBundleManager:MonoBehaviour  {
 				}
 
 				if (tmpLoadTask.state == LoadStatus.Cancel||
-                    tmpLoadTask.state == LoadStatus.Error
-                    )
+                    tmpLoadTask.state == LoadStatus.Error)
                 {
                     mAssetBundleLoadTaskQueue.Dequeue ();
 					return;
 				}
 				else if (tmpLoadTask.state == LoadStatus.Wait) 
 				{
-
-                    StartCoroutine( tmpLoadTask.LoadAsync());
+                    StartCoroutine(tmpLoadTask.LoadAsync());
                     
 					return;
 				} 
 				else if (tmpLoadTask.state ==LoadStatus.Loading) 
-				{
-                   
+				{                 
 					return;
 				} 
 				else if (tmpLoadTask.state == LoadStatus.Finish)
@@ -114,7 +155,6 @@ public class AssetBundleManager:MonoBehaviour  {
 
                     mAssetBundleLoadTaskQueue.Dequeue ();
 
-					//Debug.Log ("LoadTask Count:" + mLoadingAssetQueue.Count);
 				}
 			}
 		}
@@ -155,9 +195,7 @@ public class AssetBundleManager:MonoBehaviour  {
 
         if (mAssetBundleDic.ContainsKey(tmpAssetBundleName) == false)
         {
-            AssetBundle tmpAssetBundle = varLoadTask.assetBundle;
-
-            AssetBundleEntity tmpBundleEntity = new AssetBundleEntity(tmpAssetBundleName, tmpAssetBundle);
+            AssetBundleEntity tmpBundleEntity = new AssetBundleEntity(tmpAssetBundleName, varLoadTask.assetBundle);
 
             mAssetBundleDic.Add(tmpAssetBundleName, tmpBundleEntity);
         }
@@ -168,6 +206,20 @@ public class AssetBundleManager:MonoBehaviour  {
 
     public AssetBundleLoadTask Load(string varAssetBundleName,System.Action<AssetBundleEntity> varCallback)
     {
+        //没有初始化完成，加入等待队列
+        if (mInited == false)
+        {
+            AssetBundleWaitTask waitTask = new AssetBundleWaitTask
+            {
+                assetBundleName = varAssetBundleName,
+                callback = varCallback
+            };
+
+            mWaitTaskQueue.Enqueue(waitTask);
+
+            return null;
+        }
+
         string tmpAssetBundleName = varAssetBundleName.ToLower();
 
         AssetBundleLoadTask tmpLoadTask = null;
@@ -229,7 +281,14 @@ public class AssetBundleManager:MonoBehaviour  {
 		return tmpBundleEntity;
 	}
 
-
+    public void UnLoad(string varAssetBundleName)
+    {
+        AssetBundleEntity assetBundleEntity = GetAssetBundleEntity(varAssetBundleName);
+        if(assetBundleEntity!=null)
+        {
+            UnLoad(assetBundleEntity);
+        }
+    }
 
     public void UnLoad(AssetBundleEntity varBundleEntity)
 	{
@@ -255,7 +314,6 @@ public class AssetBundleManager:MonoBehaviour  {
         {
             if (it.Current.Value.Dependence(varAssetBundleName))
             {
-
                 return true;
             }
         }
@@ -263,21 +321,21 @@ public class AssetBundleManager:MonoBehaviour  {
     }
 
 
-	public  string GetAssetBundlePath()
+	public string GetAssetBundlePath()
 	{
         if (string.IsNullOrEmpty(mAssetBundlePath))
         {
             if (Application.platform == RuntimePlatform.Android)
             {
-                mAssetBundlePath = Application.dataPath + "!/assets/StreamingAssets/";
+                mAssetBundlePath = Application.streamingAssetsPath+"/" ;
             }
             else if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                mAssetBundlePath = Application.persistentDataPath + "/StreamingAssets/";
+                mAssetBundlePath = Application.streamingAssetsPath + "/";
             }
             else
             {
-                mAssetBundlePath = Application.dataPath + "/../StreamingAssets/";
+                mAssetBundlePath = Application.dataPath + "/StreamingAssets/";
             }
         }
         return mAssetBundlePath;

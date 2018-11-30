@@ -6,7 +6,7 @@ using System;
 
 public class AssetBundleEditor : Editor
 {
-    static string mOutputPath = Application.dataPath + "/../StreamingAssets/";
+    static string mOutputPath = Application.dataPath + "/StreamingAssets/";
     static string mAssetPath =  Application.dataPath + "/R/";
     [MenuItem("BuildAssetBundle/BuildAssets")]
     static void BuildAssets()
@@ -39,7 +39,7 @@ public class AssetBundleEditor : Editor
         EditorUtility.DisplayProgressBar("BuildScene", "BuildSceneAssetBundle", 0f);
         for (int i = 0; i < tmpScenes.Length; i++)
         {
-            string tmpSceneAssetbundlePath = mOutputPath + tmpScenes[i].ToLower();
+            string tmpSceneAssetbundlePath = mOutputPath + tmpScenes[i].ToLower().Replace(".unity",".level");
             string tmpSceneAssetbundleDir = Path.GetDirectoryName(tmpSceneAssetbundlePath);
             if (Directory.Exists(tmpSceneAssetbundleDir) == false)
             {
@@ -104,7 +104,8 @@ public class AssetBundleEditor : Editor
             string tmpStringFilePath = tmpFileArray[i];
 
             if (tmpStringFilePath.EndsWith(".cs")
-                || tmpStringFilePath.EndsWith(".meta"))
+                || tmpStringFilePath.EndsWith(".meta")
+                )
             {
                 continue;
             }
@@ -134,7 +135,9 @@ public class AssetBundleEditor : Editor
             string tmpStringFilePath = tmpFileArray[i];
 
             if (tmpStringFilePath.EndsWith(".cs")
-                || tmpStringFilePath.EndsWith(".meta"))
+                || tmpStringFilePath.EndsWith(".meta")
+                || tmpStringFilePath.EndsWith(".unity")
+                || tmpStringFilePath.EndsWith(".js"))
             {
                 continue;
             }

@@ -12,6 +12,7 @@ public class AssetDemo : MonoBehaviour {
 
     void Awake()
     {
+       
         AssetBundleManager.GetSingleton().Init("StreamingAssets");
     }
 	// Use this for initialization
@@ -59,9 +60,9 @@ public class AssetDemo : MonoBehaviour {
     }
     private void OnGUI()
     {
-        if (GUI.Button(new Rect(20, 20, 100, 40), "Change test scene"))
+        if (GUI.Button(new Rect(20, 20, 200, 40), "Change test scene"))
         {
-            AssetBundleManager.GetSingleton().Load("assets/r/scenes/test.unity", (bundleEntity) =>
+            AssetBundleManager.GetSingleton().Load("assets/r/scenes/test.level", (bundleEntity) =>
             {
 
                 if (bundleEntity != null)
@@ -70,6 +71,10 @@ public class AssetDemo : MonoBehaviour {
                 }
             });
         }
+
+        GUI.Label(new Rect(20, 60, 1000, 40), Application.streamingAssetsPath);
+        GUI.Label(new Rect(20, 80, 1000, 40), Application.dataPath);
+        GUI.Label(new Rect(20, 100, 1000, 40), Application.persistentDataPath);
     }
 
     private void OnApplicationQiut()
@@ -77,4 +82,8 @@ public class AssetDemo : MonoBehaviour {
         AssetBundleManager.GetSingleton().Destroy();
     }
 
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+
+    }
 }
