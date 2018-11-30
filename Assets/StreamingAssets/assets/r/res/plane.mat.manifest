@@ -1,0 +1,21 @@
+ManifestFileVersion: 0
+CRC: 1145843601
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 7aad4662f0090cd5f4c96292b35b351a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: fe397485c3cec1106b49e9ff95e8f8a2
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+Assets:
+- Assets/R/res/plane.mat
+Dependencies:
+- D:/WorkSpace/AssetBundleLoader/Assets/StreamingAssets/assets/r/res/companylogo_ppay.png
