@@ -3,9 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-
-
-
+public enum LoadType
+{
+    Sync,
+    Async,
+    WWW,
+}
 public class AssetBundleManager:MonoBehaviour  {
 
     #region GetSingleton
@@ -48,17 +51,71 @@ public class AssetBundleManager:MonoBehaviour  {
 
     private Queue<AssetBundleWaitTask> mWaitTaskQueue = new Queue<AssetBundleWaitTask>();
 
+    public  LoadType loadType = LoadType.Async;
+
     public void Init(string varAssetManifestName)
 	{
         mInited = false;
 
         assetMode = PlayerPrefs.GetInt("assetmode");
 
-        StartCoroutine(LoadManifest(varAssetManifestName));
+        if (loadType == LoadType.Sync)
+        {
+            LoadManifest(varAssetManifestName);
+        }
+        else if(loadType == LoadType.Async)
+        {
+            StartCoroutine(LoadManifestAsync(varAssetManifestName));
+        }
+        else
+        {
+            StartCoroutine(LoadManifestWWW(varAssetManifestName));
+        }
+    }
+
+    private void LoadManifest(string varAssetManifestName)
+    {
+        string tmpAssetManifestPath = GetAssetBundlePath() + varAssetManifestName;
+
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            tmpAssetManifestPath = Uri.EscapeUriString(tmpAssetManifestPath);
+        }
+
+        var assetBundle = AssetBundle.LoadFromFile(tmpAssetManifestPath);
+
+        if (assetBundle)
+        {
+            LoadAssetManifestFinish(assetBundle);
+        }
+        else
+        {
+            Debug.LogError(varAssetManifestName + ": Error!!");
+        }
+    }
+    private IEnumerator LoadManifestAsync(string varAssetManifestName)
+    {
+        string tmpAssetManifestPath = GetAssetBundlePath() + varAssetManifestName;
+
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            tmpAssetManifestPath = Uri.EscapeUriString(tmpAssetManifestPath);
+        }
+
+        var request = AssetBundle.LoadFromFileAsync(tmpAssetManifestPath);
+        yield return request;
+
+        if(request.isDone && request.assetBundle)
+        {
+            LoadAssetManifestFinish(request.assetBundle);
+        }
+        else
+
+        { Debug.LogError(varAssetManifestName + ": Error!!" ); }
 
     }
 
-    private IEnumerator LoadManifest(string varAssetManifestName)
+    private IEnumerator LoadManifestWWW(string varAssetManifestName)
     {
         string tmpAssetManifestPath = GetAssetBundlePath() + varAssetManifestName;
 
@@ -74,30 +131,34 @@ public class AssetBundleManager:MonoBehaviour  {
 
             if (www.isDone && www.assetBundle)
             {
-                mManifestAssetBundle = www.assetBundle;
-
-                mManifest = mManifestAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
-
-                DontDestroyOnLoad(mManifest);
-
-                mInited = true;
-
-                while(mWaitTaskQueue.Count >0)
-                {
-                    var waitTask = mWaitTaskQueue.Dequeue();
-                    Load(waitTask.assetBundleName, waitTask.callback);
-                }
+                LoadAssetManifestFinish(www.assetBundle);
             }
             else
             {
                 Debug.LogError(varAssetManifestName + ":" + www.error);
                
-           }
+            }
+        }
+    }
+    private void LoadAssetManifestFinish(AssetBundle assetBundle)
+    {
+        mManifestAssetBundle = assetBundle;
+
+        mManifest = mManifestAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+
+        DontDestroyOnLoad(mManifest);
+
+        mInited = true;
+
+        while (mWaitTaskQueue.Count > 0)
+        {
+            var waitTask = mWaitTaskQueue.Dequeue();
+            Load(waitTask.assetBundleName, waitTask.callback);
         }
     }
 
 
-	void Update()
+    void Update()
 	{
         if(mInited == false)
         {
@@ -140,8 +201,18 @@ public class AssetBundleManager:MonoBehaviour  {
 				}
 				else if (tmpLoadTask.state == LoadStatus.Wait) 
 				{
-                    StartCoroutine(tmpLoadTask.LoadAsync());
-                    
+                    if (loadType == LoadType.Sync)
+                    {
+                        tmpLoadTask.LoadSync();
+                    }
+                    else if(loadType == LoadType.Async)
+                    {
+                        StartCoroutine(tmpLoadTask.LoadAsync());
+                    }
+                    else
+                    {
+                        StartCoroutine(tmpLoadTask.LoadWWW());
+                    }
 					return;
 				} 
 				else if (tmpLoadTask.state ==LoadStatus.Loading) 

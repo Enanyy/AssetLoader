@@ -38,8 +38,53 @@ public class AssetBundleLoadTask
         state = LoadStatus.Wait;
         assetBundle = null;
     }
+    public void LoadSync()
+    {
+        string tmpFullPath = AssetBundleManager.GetSingleton().GetAssetBundlePath() + assetBundleName;
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            tmpFullPath = Uri.EscapeUriString(tmpFullPath);
+        }
+
+        state = LoadStatus.Loading;
+
+        assetBundle = AssetBundle.LoadFromFile(tmpFullPath);
+        if(assetBundle)
+        {
+            state = LoadStatus.Finish;
+        }
+        else
+        {
+            Debug.LogError("Load assetbundle " +assetBundleName + " error!!");
+            state = LoadStatus.Error;
+        }
+    }
 
     public IEnumerator LoadAsync()
+    {
+        string tmpFullPath = AssetBundleManager.GetSingleton().GetAssetBundlePath() + assetBundleName;
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            tmpFullPath = Uri.EscapeUriString(tmpFullPath);
+        }
+
+        state = LoadStatus.Loading;
+        var request = AssetBundle.LoadFromFileAsync(tmpFullPath);
+        yield return request;
+
+        if(request.isDone && request.assetBundle)
+        {
+            assetBundle = request.assetBundle;
+            state = LoadStatus.Finish;
+        }
+        else
+        {
+            state = LoadStatus.Error;
+        }
+
+    }
+
+    public IEnumerator LoadWWW()
     {
         string tmpFullPath = AssetBundleManager.GetSingleton().GetAssetBundlePath() + assetBundleName;
         if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -63,7 +108,6 @@ public class AssetBundleLoadTask
                 state = LoadStatus.Error;
             }
         }
-
     }
 
    
