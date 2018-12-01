@@ -189,6 +189,7 @@ public class AssetBundleEntity
         {
             referenceCount += it.Current.Value.Count;
         }
+        it.Dispose();
         if(referenceCount==0)
         {
             UnLoad();
@@ -223,7 +224,8 @@ public class AssetBundleEntity
                 return true;
             }
         }
-        
+        it.Dispose();
+
         return false;
     }
 
@@ -244,6 +246,7 @@ public class AssetBundleEntity
             {
                 it.Current.Value.UnLoad();
             }
+            it.Dispose();
             dependences.Clear();
         }
     }

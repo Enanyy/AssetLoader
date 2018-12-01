@@ -57,5 +57,10 @@ public class Demo : MonoBehaviour {
                 }
             });
         }
+
+        if (GUI.Button(new Rect(10, 260, 100, 40), "Destroy"))
+        {
+            AssetBundleManager.GetSingleton().Destroy();
+        }
     }
 }

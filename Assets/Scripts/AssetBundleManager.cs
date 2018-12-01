@@ -224,8 +224,7 @@ public class AssetBundleManager : MonoBehaviour
     }
 
     public bool OtherDependence(AssetBundleEntity varAssetBundleEntity ,string varAssetBundleName)
-    {
-       
+    {    
         var it = mAssetBundleDic.GetEnumerator();
         while (it.MoveNext())
         {
@@ -235,6 +234,8 @@ public class AssetBundleManager : MonoBehaviour
                 return true;
             }
         }
+        it.Dispose();
+
         return false;
     }
 
@@ -253,11 +254,7 @@ public class AssetBundleManager : MonoBehaviour
         mAssetBundleDic.Keys.CopyTo(tmpAssetBundleArray, 0);
         for (int i = 0, max = tmpAssetBundleArray.Length; i < max; ++i)
         {
-            AssetBundleEntity tmpBundleEntity = GetAssetBundleEntity(tmpAssetBundleArray[i]);
-            if(tmpBundleEntity!=null)
-            {
-                tmpBundleEntity.UnLoad();
-            }
+            UnLoad(tmpAssetBundleArray[i]);
         }
 
         Array.Clear(tmpAssetBundleArray, 0, tmpAssetBundleArray.Length);
@@ -269,5 +266,6 @@ public class AssetBundleManager : MonoBehaviour
         {
             mManifestAssetBundle.Unload(true);
         }
+        mManifest = null;
     }
 }

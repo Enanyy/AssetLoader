@@ -18,7 +18,7 @@ public class AssetEntity
 
     public void LoadAsset(string varAssetBundleName, string varAssetName, System.Action<GameObject> varCallback = null)
     {
-        assetName = varAssetName;
+        assetName = varAssetName.ToLower();
 #if UNITY_EDITOR
         if (AssetBundleManager.GetSingleton().assetMode == 0)
         {
@@ -110,6 +110,7 @@ public class AssetEntity
 
     public virtual void Destroy()
     {
+        asset = null;
         if (assetBundleEntity != null)
         {
             assetBundleEntity.RemoveReference(this);
