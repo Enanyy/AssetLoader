@@ -76,8 +76,6 @@ public class AssetBundleManager : MonoBehaviour
 
     public AssetBundleEntity GetAssetBundleEntity(string varAssetBundleName)
     {
-        varAssetBundleName = varAssetBundleName.ToLower();
-
         AssetBundleEntity assetBundleEntity = null;
 
         mAssetBundleDic.TryGetValue(varAssetBundleName, out assetBundleEntity);
@@ -87,8 +85,7 @@ public class AssetBundleManager : MonoBehaviour
 
     public AssetBundleEntity CreateAssetBundleEntity(string varAssetBundleName)
     {
-        varAssetBundleName = varAssetBundleName.ToLower();
-
+        
         AssetBundleEntity assetBundleEntity = GetAssetBundleEntity(varAssetBundleName);
 
         if(assetBundleEntity == null)
@@ -97,6 +94,19 @@ public class AssetBundleManager : MonoBehaviour
             mAssetBundleDic.Add(varAssetBundleName, assetBundleEntity);
         }
         return assetBundleEntity;
+    }
+
+    public void RemoveAssetBundleEntity(AssetBundleEntity varAssetBundleEntity)
+    {
+        if(varAssetBundleEntity == null)
+        {
+            return;
+        }
+        string assetBundleName = varAssetBundleEntity.assetBundleName;
+        if(mAssetBundleDic.ContainsKey(assetBundleName))
+        {
+            mAssetBundleDic.Remove(assetBundleName);
+        }
     }
 
     public string GetAssetBundlePath()
@@ -132,11 +142,12 @@ public class AssetBundleManager : MonoBehaviour
 
     public bool OtherDependence(AssetBundleEntity varAssetBundleEntity ,string varAssetBundleName)
     {
-        varAssetBundleName = varAssetBundleName.ToLower();
+       
         var it = mAssetBundleDic.GetEnumerator();
         while (it.MoveNext())
         {
-            if (it.Current.Value != varAssetBundleEntity && it.Current.Value.Dependence(varAssetBundleName))
+            if (it.Current.Value != varAssetBundleEntity 
+                && it.Current.Value.Dependence(varAssetBundleName))
             {
                 return true;
             }

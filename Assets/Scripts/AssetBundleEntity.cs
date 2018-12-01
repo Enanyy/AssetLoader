@@ -29,7 +29,7 @@ public class AssetBundleEntity
         {
             for (int i =0; i <dependenceNames.Length; ++i)
             {
-                string dependenceName = dependenceNames[i].ToLower();
+                string dependenceName = dependenceNames[i];
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
@@ -47,22 +47,29 @@ public class AssetBundleEntity
         string tmpAssetBundlePath = AssetBundleManager.GetSingleton().GetAssetBundlePath() + assetBundleName;
 
         assetBundle = AssetBundle.LoadFromFile(tmpAssetBundlePath);
+        if(assetBundle== null)
+        {
+            Debug.LogError("Load assetbundle:" + assetBundleName + " failed!!");
+        }
     }
-   
 
-    public UnityEngine.Object LoadAsset(string varAssetName)
+
+    public Object LoadAsset(string varAssetName)
     {
-        if(string.IsNullOrEmpty(varAssetName))
+        if (string.IsNullOrEmpty(varAssetName))
         {
             return null;
         }
-        varAssetName = varAssetName.ToLower();
-        if(mAssetDic.ContainsKey(varAssetName)==false)
-        {
-            mAssetDic[varAssetName] = assetBundle.LoadAsset<UnityEngine.Object>(varAssetName);
-        }
 
-        return mAssetDic[varAssetName];
+        if (assetBundle && mAssetDic.ContainsKey(varAssetName) == false)
+        {
+            mAssetDic[varAssetName] = assetBundle.LoadAsset<Object>(varAssetName);
+        }
+        if (mAssetDic.ContainsKey(varAssetName))
+        {
+            return mAssetDic[varAssetName];
+        }
+        return null;
     }
 
     public void AddReference(AssetEntity varReference)
@@ -71,7 +78,7 @@ public class AssetBundleEntity
         {
             return;
         }
-        string varAssetName = varReference.assetName.ToLower();
+        string varAssetName = varReference.assetName;
         if(references.ContainsKey(varAssetName)==false)
         {
             references.Add(varAssetName, new List<AssetEntity>());
@@ -89,7 +96,7 @@ public class AssetBundleEntity
         {
             return;
         }
-        string varAssetName = varReference.assetName.ToLower();
+        string varAssetName = varReference.assetName;
         if (references.ContainsKey(varAssetName))
         {
             references[varAssetName].Remove(varReference);
@@ -113,12 +120,11 @@ public class AssetBundleEntity
             return false;
         }
 
-        varAssetBundleName = varAssetBundleName.ToLower();
         if(dependenceNames!=null)
         {
             for (int i = 0; i < dependenceNames.Length; ++i)
             {
-                string dependenceName = dependenceNames[i].ToLower();
+                string dependenceName = dependenceNames[i];
                 if(dependenceName == varAssetBundleName)
                 {
                     return true;
@@ -141,24 +147,23 @@ public class AssetBundleEntity
 
     public void UnLoad()
     {
-        assetBundleName = null;
-        if (assetBundle != null)
+        if (AssetBundleManager.GetSingleton().OtherDependence(this, assetBundleName) == false)
         {
+            AssetBundleManager.GetSingleton().RemoveAssetBundleEntity(this);
 
-            assetBundle.Unload(true);
-            assetBundle = null;
-        }
-        
-        //卸载依赖
-        for (int i = 0, max = dependenceNames.Length; i < max; ++i)
-        {
-            string dependenceName = dependenceNames[i].ToLower();
-            if (AssetBundleManager.GetSingleton().OtherDependence(this, dependenceName) == false)
+            if (assetBundle != null)
             {
-                dependences[dependenceName].UnLoad();
+                assetBundle.Unload(true);
+                assetBundle = null;
             }
+
+            var it = dependences.GetEnumerator();
+            while(it.MoveNext())
+            {
+                it.Current.Value.UnLoad();
+            }
+            dependences.Clear();
         }
-        dependences.Clear();
     }
 }
 
