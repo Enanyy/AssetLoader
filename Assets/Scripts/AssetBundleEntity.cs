@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
+using System.Collections;
 
 public class AssetBundleEntity
 {
@@ -44,7 +44,7 @@ public class AssetBundleEntity
                 }
             }
         }
-        string tmpAssetBundlePath = AssetBundleManager.GetSingleton().GetAssetBundlePath() + assetBundleName;
+        string tmpAssetBundlePath = AssetBundleManager.GetSingleton().GetAssetBundlePath(assetBundleName);
 
         assetBundle = AssetBundle.LoadFromFile(tmpAssetBundlePath);
         if(assetBundle== null)
@@ -52,7 +52,90 @@ public class AssetBundleEntity
             Debug.LogError("Load assetbundle:" + assetBundleName + " failed!!");
         }
     }
+    public IEnumerator LoadAsync(System.Action<AssetBundleEntity> varCallback = null)
+    {
+        if (dependenceNames != null)
+        {
+            for (int i = 0; i < dependenceNames.Length; ++i)
+            {
+                string dependenceName = dependenceNames[i];
 
+                if (dependences.ContainsKey(dependenceName) == false)
+                {
+                    AssetBundleEntity assetBundleEntity = AssetBundleManager.GetSingleton().CreateAssetBundleEntity(dependenceName);
+
+                    dependences[dependenceName] = assetBundleEntity;
+
+                    if (assetBundleEntity.assetBundle == null)
+                    {
+                        var coroutine =  AssetBundleManager.GetSingleton().StartCoroutine(assetBundleEntity.LoadAsync());
+                        yield return coroutine;
+                    }
+                }
+            }
+        }
+
+        string tmpAssetBundlePath = AssetBundleManager.GetSingleton().GetAssetBundlePath(assetBundleName);
+
+        var request = AssetBundle.LoadFromFileAsync(tmpAssetBundlePath);
+        yield return request;
+
+        if (request.isDone && request.assetBundle)
+        {
+            assetBundle = request.assetBundle;
+        }
+        else
+        {
+            Debug.LogError("Load assetbundle:" + assetBundleName + " failed from:" + assetBundleName + "!!");
+        }
+        if (varCallback != null)
+        {
+            varCallback(this);
+        }
+    }
+
+    public IEnumerator LoadWWW(System.Action<AssetBundleEntity> varCallback = null)
+    {
+        if (dependenceNames != null)
+        {
+            for (int i = 0; i < dependenceNames.Length; ++i)
+            {
+                string dependenceName = dependenceNames[i];
+
+                if (dependences.ContainsKey(dependenceName) == false)
+                {
+                    AssetBundleEntity assetBundleEntity = AssetBundleManager.GetSingleton().CreateAssetBundleEntity(dependenceName);
+
+                    dependences[dependenceName] = assetBundleEntity;
+
+                    if (assetBundleEntity.assetBundle == null)
+                    {
+                        var coroutine = AssetBundleManager.GetSingleton().StartCoroutine(assetBundleEntity.LoadWWW());
+                        yield return coroutine;
+                    }
+                }
+            }
+        }
+
+        string tmpAssetBundlePath = AssetBundleManager.GetSingleton().GetAssetBundlePath(assetBundleName);
+
+        using (WWW www = new WWW(tmpAssetBundlePath))
+        {
+            yield return www;
+            if(www.isDone && www.assetBundle)
+            {
+                assetBundle = www.assetBundle;
+            }
+            else
+            {
+                Debug.LogError("Load assetbundle:" + assetBundleName + " failed from:" + assetBundleName + "!!");
+            }
+            if (varCallback != null)
+            {
+                varCallback(this);
+            }
+        }
+    }
 
     public Object LoadAsset(string varAssetName)
     {
@@ -87,7 +170,6 @@ public class AssetBundleEntity
         {
             references[varAssetName].Add(varReference);
         }
-
     }
 
     public void RemoveReference(AssetEntity varReference)

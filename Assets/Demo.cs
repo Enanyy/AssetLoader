@@ -6,17 +6,13 @@ public class Demo : MonoBehaviour {
 
     private void Awake()
     {
-        AssetBundleManager.GetSingleton().Init("StreamingAssets");
+        AssetBundleManager.GetSingleton().Init(LoadType.Async,"StreamingAssets");
     }
     List<AssetEntity> entities = new List<AssetEntity>();
     // Use this for initialization
     void Start () {
 
-        string cube = "assets/r/res/cube.prefab";
-
-        AssetEntity entity = new AssetEntity();
-        entity.LoadAsset(cube, cube);
-        entities.Add(entity);
+      
     }
 
     

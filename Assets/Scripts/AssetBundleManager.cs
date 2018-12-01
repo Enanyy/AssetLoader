@@ -9,6 +9,7 @@ public enum LoadType
     Async,
     WWW,
 }
+
 public class AssetBundleManager : MonoBehaviour
 {
 
@@ -32,45 +33,117 @@ public class AssetBundleManager : MonoBehaviour
     private Dictionary<string, AssetBundleEntity> mAssetBundleDic = new Dictionary<string, AssetBundleEntity>();
 
     public int assetMode { get; private set; }
-    public void Init(string varAssetManifestName)
+    public LoadType loadType { get; private set; }
+    public bool initialized { get; private set; }
+    public void Init(LoadType type, string varAssetBundleManifestName)
     {
+        loadType = type;
+
         assetMode = PlayerPrefs.GetInt("assetmode");
 
-        string tmpAssetManifestPath = GetAssetBundlePath() + varAssetManifestName;
-
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        if(loadType == LoadType.Sync)
         {
-            tmpAssetManifestPath = Uri.EscapeUriString(tmpAssetManifestPath);
+            string tmpAssetManifestPath = GetAssetBundlePath(varAssetBundleManifestName);
+
+            var assetBundle = AssetBundle.LoadFromFile(tmpAssetManifestPath);
+
+            if (assetBundle)
+            {
+                OnInitFinish(assetBundle);
+            }
+            else
+            {
+                Debug.LogError(varAssetBundleManifestName + ": Error!!");
+            }
         }
-
-        var assetBundle = AssetBundle.LoadFromFile(tmpAssetManifestPath);
-
-        if (assetBundle)
+        else if(loadType == LoadType.Async)
         {
-            mManifestAssetBundle = assetBundle;
+            StartCoroutine(InitAsync(varAssetBundleManifestName));
+        }
+        else if(loadType == LoadType.WWW)
+        {
+            StartCoroutine(InitWWW(varAssetBundleManifestName));
+        }
+    }
+    private IEnumerator InitAsync(string varAssetBundleManifestName)
+    {
+        string tmpAssetBundlePath = GetAssetBundlePath(varAssetBundleManifestName);
 
-            mManifest = mManifestAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+        var request = AssetBundle.LoadFromFileAsync(tmpAssetBundlePath);
+        yield return request;
 
-            DontDestroyOnLoad(mManifest);
+        if (request.isDone && request.assetBundle)
+        {
+            OnInitFinish(request.assetBundle);
         }
         else
         {
-            Debug.LogError(varAssetManifestName + ": Error!!");
+            Debug.LogError("Load assetbundle:" + varAssetBundleManifestName + " failed!!");
         }
     }
+    private IEnumerator InitWWW(string varAssetBundleManifestName)
+    {
+        string tmpAssetBundlePath = GetAssetBundlePath(varAssetBundleManifestName);
+
+        using (WWW www = new WWW(tmpAssetBundlePath))
+        {
+            yield return www;
+            if (www.isDone && www.assetBundle)
+            {
+                OnInitFinish(www.assetBundle);
+            }
+            else
+            {
+                Debug.LogError("Load assetbundle:" + varAssetBundleManifestName + " failed!!");
+            }              
+        }
+    }
+    private void OnInitFinish(AssetBundle assetBundle)
+    {
+        mManifestAssetBundle = assetBundle;
+
+        mManifest = mManifestAssetBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
+
+        DontDestroyOnLoad(mManifest);
+
+        initialized = true;
+    }
+
     public void Load(string varAssetBundleName, Action<AssetBundleEntity> varCallback)
     {
+        if (initialized == false)
+        {
+            return;
+        }
         varAssetBundleName = varAssetBundleName.ToLower();
 
         AssetBundleEntity assetBundleEntity = CreateAssetBundleEntity(varAssetBundleName);
 
         if (assetBundleEntity.assetBundle == null)
         {
-            assetBundleEntity.Load();
+            if (loadType == LoadType.Sync)
+            {
+                assetBundleEntity.Load();
+                if (varCallback != null)
+                {
+                    varCallback(assetBundleEntity);
+                }
+            }
+            else if(loadType== LoadType.Async)
+            {
+                StartCoroutine(assetBundleEntity.LoadAsync(varCallback));
+            }
+            else if(loadType == LoadType.WWW)
+            {
+                StartCoroutine(assetBundleEntity.LoadWWW(varCallback));
+            }
         }
-        if(varCallback!=null)
+        else
         {
-            varCallback(assetBundleEntity);
+            if (varCallback != null)
+            {
+                varCallback(assetBundleEntity);
+            }
         }
     }
 
@@ -109,7 +182,17 @@ public class AssetBundleManager : MonoBehaviour
         }
     }
 
-    public string GetAssetBundlePath()
+    public string GetAssetBundlePath(string varAssetBundleName)
+    {
+        string fullpath = GetAssetBundleRoot() + varAssetBundleName;
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            fullpath = Uri.EscapeUriString(fullpath);
+        }
+        return fullpath;
+    }
+
+    public string GetAssetBundleRoot()
     {
         if (string.IsNullOrEmpty(mAssetBundlePath))
         {
