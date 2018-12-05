@@ -11,6 +11,8 @@ public class AssetEntity
 
     public GameObject gameObject { get; private set; }
 
+    public bool isPool { get; set; }
+
     public AssetEntity()
     {
         gameObject = new GameObject(GetType().Name);
@@ -54,7 +56,6 @@ public class AssetEntity
 
         AssetBundleManager.GetSingleton().Load(varAssetBundleName, (varAssetBundleEntity) =>
         {
-
             if (varAssetBundleEntity != null)
             {
                 assetBundleEntity = varAssetBundleEntity;
@@ -82,7 +83,6 @@ public class AssetEntity
                         varCallback(null);
                     }
                 }
-
             }
             else
             {
@@ -104,11 +104,24 @@ public class AssetEntity
 
     ~AssetEntity()
     {
-        //Destroy();
+        
+    }
+    public virtual void OnCreate()
+    {
+        gameObject.SetActive(true);
     }
 
+    public virtual void OnRecycle()
+    {
+        gameObject.SetActive(false);
+    }
 
-    public virtual void Destroy()
+    public void Recycle()
+    {
+        AssetEntityPool.GetSingleton().RecycleAssetEntity(this);
+    }
+
+    public void Destroy()
     {
         asset = null;
         if (assetBundleEntity != null)

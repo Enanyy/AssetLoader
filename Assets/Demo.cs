@@ -1,27 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public class Demo : MonoBehaviour {
+public class Demo : MonoBehaviour
+{
 
     private void Awake()
     {
-        AssetBundleManager.GetSingleton().Init(LoadType.Async,"StreamingAssets");
+        AssetBundleManager.GetSingleton().Init(LoadType.Async, "StreamingAssets");
     }
     List<AssetEntity> entities = new List<AssetEntity>();
     // Use this for initialization
-    void Start () {
+   
+    void Start()
+    {
 
-      
+       
     }
-
-    
-	
-	// Update is called once per frame
-	void OnGUI () {
-		if(GUI.Button(new Rect(10,20,100,40),"Delete"))
+  
+    // Update is called once per frame
+    void OnGUI()
+    {
+        if (GUI.Button(new Rect(10, 20, 100, 40), "Delete"))
         {
-            if(entities.Count >0)
+            if (entities.Count > 0)
             {
                 entities[0].Destroy();
                 entities.RemoveAt(0);
@@ -50,8 +53,9 @@ public class Demo : MonoBehaviour {
         {
             string level = "assets/r/scenes/test.level";
 
-            AssetBundleManager.GetSingleton().Load(level, (varAssetBundleEntity) => {
-                if(varAssetBundleEntity!=null && varAssetBundleEntity.assetBundle)
+            AssetBundleManager.GetSingleton().Load(level, (varAssetBundleEntity) =>
+            {
+                if (varAssetBundleEntity != null && varAssetBundleEntity.assetBundle)
                 {
                     UnityEngine.SceneManagement.SceneManager.LoadScene("test");
                 }
@@ -62,5 +66,6 @@ public class Demo : MonoBehaviour {
         {
             AssetBundleManager.GetSingleton().Destroy();
         }
-    }
+
+	}
 }

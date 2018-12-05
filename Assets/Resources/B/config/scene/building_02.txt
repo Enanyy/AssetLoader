@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<STScene startPoint="(0.0, 0.0)" width="100" height="100" fog="False" fogColor="(127,127,127,255)" fogmode="ExponentialSquared" fogDensity="0.01" fogStartDistance="0" fogEndDistance="300" ambientMode="Skybox" ambientLight="(54,57,66,255)" ambientEquatorColor="(29,31,33,255)" ambientGroundColor="(11,10,8,255)" ambientSkyColor="(54,57,66,255)" name="STScene" position="(0,0,0)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0">
+  <STSceneGroup name="Terrain" position="(0,0,0)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0">
+    <STSceneEntity path="suab/model/scene_models/terrain/terrain_all.prefab" position="(0,0,0)" rotation="(0,90,0)" scale="(1.870001,1.87,1.870001)" active="True" layer="0" />
+  </STSceneGroup>
+  <STSceneGroup name="pos" position="(0,0,0)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0">
+    <STScenePoint index="1" position="(68,0,82)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0" />
+    <STScenePoint index="2" position="(78,0,86)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0" />
+    <STScenePoint index="3" position="(70,0,68)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0" />
+    <STScenePoint index="4" position="(82,0,70)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0" />
+    <STScenePoint index="5" position="(75,0,75)" rotation="(0,0,0)" scale="(1.6,1.6,1.6)" active="True" layer="0" />
+    <STScenePoint index="6" position="(83.46,0,79.32)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0" />
+    <STScenePoint index="7" position="(75,0,75)" rotation="(0,0,0)" scale="(1,1,1)" active="True" layer="0" />
+  </STSceneGroup>
+  <STSceneCamera fieldOfView="40" nearClipPlane="0.3" farClipPlane="1000" depth="-1" position="(103.67,32.4,63.01)" rotation="(49.08068,290.9468,3.91044E-05)" scale="(1,1,1)" active="True" layer="0" />
+  <STSceneLight lightType="Directional" color="(255,244,214,255)" range="10" intensity="1.6" shadowType="Soft" renderMode="Auto" cullingMask="-1" shadowStrength="1" shadowResolution="FromQualitySettings" shadowBias="0.05" shadowNormalBias="0.4" shadowNearPlane="0.2" position="(0,3,0)" rotation="(60.09288,330,-3.424715E-06)" scale="(1,1,1)" active="True" layer="0" />
+</STScene>
