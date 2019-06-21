@@ -179,11 +179,11 @@ public class AssetBundleEditor : Editor
     [MenuItem("BuildAssetBundle/SetEditorMode")]
     static void SetEditorMode()
     {
-        PlayerPrefs.SetInt("assetmode", 0);
+        PlayerPrefs.SetInt("assetMode", (int)AssetMode.Editor);
     }
     [MenuItem("BuildAssetBundle/SetAssetBundleMode")]
     static void SetAssetBundleMode()
     {
-        PlayerPrefs.SetInt("assetmode", 1);
+        PlayerPrefs.SetInt("assetMode", (int)AssetMode.AssetBundle);
     }
 }

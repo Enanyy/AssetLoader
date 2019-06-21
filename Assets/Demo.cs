@@ -6,13 +6,17 @@ public class Demo : MonoBehaviour {
 
     private void Awake()
     {
-        AssetBundleManager.GetSingleton().Init(LoadType.Async,"StreamingAssets");
+        AssetManager.Instance.Init(LoadType.Async,"StreamingAssets");
     }
-    List<AssetEntity> entities = new List<AssetEntity>();
+    List<AssetObject> entities = new List<AssetObject>();
     // Use this for initialization
     void Start () {
 
-      
+        Debug.Log(transform.forward);
+        Debug.Log(transform.rotation * Vector3.forward);
+
+        Debug.Log(transform.right);
+        Debug.Log(transform.rotation * Vector3.right);
     }
 
     
@@ -32,7 +36,7 @@ public class Demo : MonoBehaviour {
         {
             string cube = "assets/r/res/cube.prefab";
 
-            AssetEntity entity = new AssetEntity();
+            AssetObject entity = new AssetObject();
             entity.LoadAsset(cube, cube);
             entities.Add(entity);
         }
@@ -41,7 +45,7 @@ public class Demo : MonoBehaviour {
         {
             string plane = "assets/r/res/plane.prefab";
 
-            AssetEntity entity = new AssetEntity();
+            AssetObject entity = new AssetObject();
             entity.LoadAsset(plane, plane);
             entities.Add(entity);
         }
@@ -50,8 +54,8 @@ public class Demo : MonoBehaviour {
         {
             string level = "assets/r/scenes/test.level";
 
-            AssetBundleManager.GetSingleton().Load(level, (varAssetBundleEntity) => {
-                if(varAssetBundleEntity!=null && varAssetBundleEntity.assetBundle)
+            AssetManager.Instance.Load(level, (varAssetBundleEntity) => {
+                if(varAssetBundleEntity!=null && varAssetBundleEntity.bundle)
                 {
                     UnityEngine.SceneManagement.SceneManager.LoadScene("test");
                 }
@@ -60,7 +64,7 @@ public class Demo : MonoBehaviour {
 
         if (GUI.Button(new Rect(10, 260, 100, 40), "Destroy"))
         {
-            AssetBundleManager.GetSingleton().Destroy();
+            AssetManager.Instance.Destroy();
         }
     }
 }

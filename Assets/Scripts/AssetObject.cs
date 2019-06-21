@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AssetEntity
+public class AssetObject
 {
-    public AssetBundleEntity assetBundleEntity { get; private set; }
+    public BundleObject bundle { get; private set; }
 
     public string assetName { get; private set; }
 
@@ -11,18 +11,18 @@ public class AssetEntity
 
     public GameObject gameObject { get; private set; }
 
-    public AssetEntity()
+    public AssetObject()
     {
         gameObject = new GameObject(GetType().Name);
     }
 
-    public void LoadAsset(string varAssetBundleName, string varAssetName, System.Action<GameObject> varCallback = null)
+    public void LoadAsset(string bundleName, string assetName, System.Action<GameObject> callback = null)
     {
-        assetName = varAssetName.ToLower();
+        this.assetName = assetName.ToLower();
 #if UNITY_EDITOR
-        if (AssetBundleManager.GetSingleton().assetMode == 0)
+        if (AssetManager.Instance.assetMode == 0)
         {
-            asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(varAssetName);
+            asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
 
             if (asset)
             {
@@ -34,16 +34,16 @@ public class AssetEntity
 
                 OnLoadAsset(go);
 
-                if (varCallback != null)
+                if (callback != null)
                 {
-                    varCallback(go);
+                    callback(go);
                 }
             }
             else
             {
-                if (varCallback != null)
+                if (callback != null)
                 {
-                    varCallback(null);
+                    callback(null);
                 }
             }
 
@@ -52,14 +52,14 @@ public class AssetEntity
         }
 #endif
 
-        AssetBundleManager.GetSingleton().Load(varAssetBundleName, (varAssetBundleEntity) =>
+        AssetManager.Instance.Load(bundleName, (entity) =>
         {
 
-            if (varAssetBundleEntity != null)
+            if (entity != null)
             {
-                assetBundleEntity = varAssetBundleEntity;
-                assetBundleEntity.AddReference(this);
-                asset = assetBundleEntity.LoadAsset(assetName);
+                bundle = entity;
+                bundle.AddReference(this);
+                asset = bundle.LoadAsset(this.assetName);
                 if (asset)
                 {
                     var go = Object.Instantiate(asset) as GameObject;
@@ -70,25 +70,25 @@ public class AssetEntity
 
                     OnLoadAsset(go);
 
-                    if (varCallback != null)
+                    if (callback != null)
                     {
-                        varCallback(go);
+                        callback(go);
                     }
                 }
                 else
                 {
-                    if (varCallback != null)
+                    if (callback != null)
                     {
-                        varCallback(null);
+                        callback(null);
                     }
                 }
 
             }
             else
             {
-                if (varCallback != null)
+                if (callback != null)
                 {
-                    varCallback(null);
+                    callback(null);
                 }
             }
         });
@@ -102,7 +102,7 @@ public class AssetEntity
 
 
 
-    ~AssetEntity()
+    ~AssetObject()
     {
         //Destroy();
     }
@@ -111,9 +111,9 @@ public class AssetEntity
     public virtual void Destroy()
     {
         asset = null;
-        if (assetBundleEntity != null)
+        if (bundle != null)
         {
-            assetBundleEntity.RemoveReference(this);
+            bundle.RemoveReference(this);
         }
         Object.Destroy(gameObject);
     }
