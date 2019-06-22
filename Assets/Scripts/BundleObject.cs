@@ -160,6 +160,31 @@ public class BundleObject
         return null;
     }
 
+    public AssetObject<T> LoadAsset<T>(string assetName) where T : UnityEngine.Object
+    {
+        AssetObject<T> assetObject = null;
+
+        var asset = LoadAsset(assetName);
+        if (asset)
+        {
+            if (typeof(T) == typeof(GameObject))
+            {
+                var go = UnityEngine.Object.Instantiate(asset) as GameObject;
+                go.transform.localPosition = Vector3.zero;
+                go.transform.localRotation = Quaternion.identity;
+                go.transform.localScale = Vector3.one;
+
+                assetObject = new AssetObject<T>(assetName, this, asset, go as T);
+            }
+            else
+            {
+                assetObject = new AssetObject<T>(assetName, this, asset, asset as T);
+            }
+        }
+
+        return assetObject;
+    }
+
     public void AddReference(IAssetObject reference)
     {
         if(reference== null)

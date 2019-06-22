@@ -130,7 +130,7 @@ public class AssetManager : MonoBehaviour
     public void LoadAsset<T>(string bundleName, string assetName, System.Action<AssetObject<T>> callback = null) where T : UnityEngine.Object
     {
         assetName = assetName.ToLower(); ;
- 
+
 #if UNITY_EDITOR
         if (assetMode == AssetMode.Editor)
         {
@@ -141,7 +141,7 @@ public class AssetManager : MonoBehaviour
             if (asset)
             {
                 if (typeof(T) == typeof(GameObject))
-                {   
+                {
                     if (callback != null)
                     {
                         var go = UnityEngine.Object.Instantiate(asset) as GameObject;
@@ -171,8 +171,6 @@ public class AssetManager : MonoBehaviour
                     callback(assetObject);
                 }
             }
-
-
             return;
         }
 #endif
@@ -181,40 +179,11 @@ public class AssetManager : MonoBehaviour
         {
             if (bundle != null)
             {
-                AssetObject<T> assetObject = null;
-               
-                var asset = bundle.LoadAsset(assetName);
-                if (asset)
-                {
-                    if (typeof(T) == typeof(GameObject))
-                    {
-                        if (callback != null)
-                        {
-                            var go = UnityEngine.Object.Instantiate(asset) as GameObject;
-                            go.transform.localPosition = Vector3.zero;
-                            go.transform.localRotation = Quaternion.identity;
-                            go.transform.localScale = Vector3.one;
+                AssetObject<T> assetObject = bundle.LoadAsset<T>(assetName);
 
-                            assetObject = new AssetObject<T>(assetName, bundle, asset, go as T); 
-
-                            callback(assetObject);
-                        }
-                    }
-                    else
-                    {
-                        if (callback != null)
-                        {
-                            assetObject = new AssetObject<T>(assetName, bundle, asset, null);
-                            callback(assetObject);
-                        }
-                    }
-                }
-                else
+                if (callback != null)
                 {
-                    if (callback != null)
-                    {
-                        callback(assetObject);
-                    }
+                    callback(assetObject);
                 }
             }
             else
