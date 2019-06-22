@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum LoadType
+public enum LoadMode
 {
     Sync,
     Async,
@@ -42,15 +42,15 @@ public class AssetManager : MonoBehaviour
     private Dictionary<string, BundleObject> mAssetBundleDic = new Dictionary<string, BundleObject>();
 
     public AssetMode assetMode { get; private set; }
-    public LoadType loadType { get; private set; }
+    public LoadMode loadMode { get; private set; }
     public bool initialized { get; private set; }
-    public void Init(LoadType type, string manifest)
+    public void Init(LoadMode mode, string manifest)
     {
-        loadType = type;
+        loadMode = mode;
 
         assetMode = (AssetMode)PlayerPrefs.GetInt("assetMode");
 
-        if(loadType == LoadType.Sync)
+        if(loadMode == LoadMode.Sync)
         {
             string path = GetPath(manifest);
 
@@ -65,11 +65,11 @@ public class AssetManager : MonoBehaviour
                 Debug.LogError(manifest + ": Error!!");
             }
         }
-        else if(loadType == LoadType.Async)
+        else if(loadMode == LoadMode.Async)
         {
             StartCoroutine(InitAsync(manifest));
         }
-        else if(loadType == LoadType.WWW)
+        else if(loadMode == LoadMode.WWW)
         {
             StartCoroutine(InitWWW(manifest));
         }
@@ -130,15 +130,15 @@ public class AssetManager : MonoBehaviour
 
         if (bundle.bundle == null)
         {
-            if (loadType == LoadType.Sync)
+            if (loadMode == LoadMode.Sync)
             {
                 bundle.Load(callback);
             }
-            else if(loadType== LoadType.Async)
+            else if(loadMode== LoadMode.Async)
             {
                 StartCoroutine(bundle.LoadAsync(callback));
             }
-            else if(loadType == LoadType.WWW)
+            else if(loadMode == LoadMode.WWW)
             {
                 StartCoroutine(bundle.LoadWWW(callback));
             }

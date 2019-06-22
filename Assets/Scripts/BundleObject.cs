@@ -33,13 +33,13 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject entity = AssetManager.Instance.CreateBundle(dependenceName);
+                    BundleObject bundle = AssetManager.Instance.CreateBundle(dependenceName);
 
-                    dependences[dependenceName] = entity;
+                    dependences[dependenceName] = bundle;
 
-                    if (entity.bundle == null)
+                    if (bundle.bundle == null)
                     {
-                        entity.Load();
+                        bundle.Load();
                     }
                 }
             }
@@ -109,13 +109,13 @@ public class BundleObject
 
                 if (dependences.ContainsKey(dependenceName) == false)
                 {
-                    BundleObject entity = AssetManager.Instance.CreateBundle(dependenceName);
+                    BundleObject bundle = AssetManager.Instance.CreateBundle(dependenceName);
 
-                    dependences[dependenceName] = entity;
+                    dependences[dependenceName] = bundle;
 
-                    if (entity.bundle == null)
+                    if (bundle.bundle == null)
                     {
-                        var coroutine = AssetManager.Instance.StartCoroutine(entity.LoadWWW());
+                        var coroutine = AssetManager.Instance.StartCoroutine(bundle.LoadWWW());
                         yield return coroutine;
                     }
                 }

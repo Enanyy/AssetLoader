@@ -6,7 +6,7 @@ public class Demo : MonoBehaviour {
 
     private void Awake()
     {
-        AssetManager.Instance.Init(LoadType.Async,"StreamingAssets");
+        AssetManager.Instance.Init(LoadMode.Async,"StreamingAssets");
     }
     List<AssetObject> entities = new List<AssetObject>();
     // Use this for initialization
@@ -37,7 +37,7 @@ public class Demo : MonoBehaviour {
             string cube = "assets/r/res/cube.prefab";
 
             AssetObject entity = new AssetObject();
-            entity.LoadAsset(cube, cube);
+            entity.LoadAsset<GameObject>(cube, cube);
             entities.Add(entity);
         }
 
@@ -46,7 +46,7 @@ public class Demo : MonoBehaviour {
             string plane = "assets/r/res/plane.prefab";
 
             AssetObject entity = new AssetObject();
-            entity.LoadAsset(plane, plane);
+            entity.LoadAsset<GameObject>(plane, plane);
             entities.Add(entity);
         }
 
@@ -54,8 +54,8 @@ public class Demo : MonoBehaviour {
         {
             string level = "assets/r/scenes/test.level";
 
-            AssetManager.Instance.Load(level, (varAssetBundleEntity) => {
-                if(varAssetBundleEntity!=null && varAssetBundleEntity.bundle)
+            AssetManager.Instance.Load(level, (bundle) => {
+                if(bundle!=null && bundle.bundle)
                 {
                     UnityEngine.SceneManagement.SceneManager.LoadScene("test");
                 }

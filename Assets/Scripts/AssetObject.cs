@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class AssetObject
 {
@@ -13,10 +12,10 @@ public class AssetObject
 
     public AssetObject()
     {
-        gameObject = new GameObject(GetType().Name);
+       
     }
 
-    public void LoadAsset(string bundleName, string assetName, System.Action<GameObject> callback = null)
+    public void LoadAsset<T>(string bundleName, string assetName, System.Action<T> callback = null) where T:UnityEngine.Object
     {
         this.assetName = assetName.ToLower();
 #if UNITY_EDITOR
@@ -26,17 +25,24 @@ public class AssetObject
 
             if (asset)
             {
-                var go = Object.Instantiate(asset) as GameObject;
-                go.transform.SetParent(gameObject.transform);
-                go.transform.localPosition = Vector3.zero;
-                go.transform.localRotation = Quaternion.identity;
-                go.transform.localScale = Vector3.one;
-
-                OnLoadAsset(go);
-
-                if (callback != null)
+                if (typeof(T) == typeof(GameObject))
                 {
-                    callback(go);
+                    gameObject = Object.Instantiate(asset) as GameObject;
+
+                    gameObject.transform.localPosition = Vector3.zero;
+                    gameObject.transform.localRotation = Quaternion.identity;
+                    gameObject.transform.localScale = Vector3.one;
+                    if (callback != null)
+                    {
+                        callback(gameObject as T);
+                    }
+                }
+                else
+                {
+                    if (callback != null)
+                    {
+                        callback(asset as T);
+                    }
                 }
             }
             else
@@ -52,28 +58,33 @@ public class AssetObject
         }
 #endif
 
-        AssetManager.Instance.Load(bundleName, (entity) =>
+        AssetManager.Instance.Load(bundleName, (bundle) =>
         {
-
-            if (entity != null)
+            if (bundle != null)
             {
-                bundle = entity;
-                bundle.AddReference(this);
-                asset = bundle.LoadAsset(this.assetName);
+                this.bundle = bundle;
+                this.bundle.AddReference(this);
+                asset = this.bundle.LoadAsset(this.assetName);
                 if (asset)
                 {
-                    var go = Object.Instantiate(asset) as GameObject;
-                    go.transform.SetParent(gameObject.transform);
-                    go.transform.localPosition = Vector3.zero;
-                    go.transform.localRotation = Quaternion.identity;
-                    go.transform.localScale = Vector3.one;
-
-                    OnLoadAsset(go);
-
-                    if (callback != null)
+                    if (typeof(T) == typeof(GameObject))
                     {
-                        callback(go);
+                        gameObject = Object.Instantiate(asset) as GameObject;
+                        gameObject.transform.localPosition = Vector3.zero;
+                        gameObject.transform.localRotation = Quaternion.identity;
+                        gameObject.transform.localScale = Vector3.one;
+                        if (callback != null)
+                        {
+                            callback(gameObject as T);
+                        }
                     }
+                    else
+                    {
+                        if(callback!= null)
+                        {
+                            callback(asset as T);
+                        }
+                    }               
                 }
                 else
                 {
@@ -93,14 +104,6 @@ public class AssetObject
             }
         });
     }
-
-
-    protected virtual void OnLoadAsset(GameObject go)
-    {
-
-    }
-
-
 
     ~AssetObject()
     {
