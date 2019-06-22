@@ -11,14 +11,14 @@ public class BundleObject
     public string[] dependenceNames { get; private set; }
 
     //场景中实例化出来的,即引用
-    public Dictionary<string, List<AssetObject>> references { get; private set; }
+    public Dictionary<string, List<IAssetObject>> references { get; private set; }
     //已经加载出来的asset
     private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
 
     public BundleObject(string varAssetbundleName)
     {
         dependences = new Dictionary<string, BundleObject>();
-        references = new Dictionary<string, List<AssetObject>>();
+        references = new Dictionary<string, List<IAssetObject>>();
         bundleName = varAssetbundleName;
         dependenceNames = AssetManager.Instance.GetAllDependencies(bundleName);
     }
@@ -160,7 +160,7 @@ public class BundleObject
         return null;
     }
 
-    public void AddReference(AssetObject reference)
+    public void AddReference(IAssetObject reference)
     {
         if(reference== null)
         {
@@ -169,7 +169,7 @@ public class BundleObject
         string name = reference.assetName;
         if(references.ContainsKey(name)==false)
         {
-            references.Add(name, new List<AssetObject>());
+            references.Add(name, new List<IAssetObject>());
         }
         if(references[name].Contains(reference)==false)
         {
@@ -177,7 +177,7 @@ public class BundleObject
         }
     }
 
-    public void RemoveReference(AssetObject reference)
+    public void RemoveReference(IAssetObject reference)
     {
         if (reference == null)
         {

@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class Demo : MonoBehaviour
 {
-    List<AssetObject> entities = new List<AssetObject>();
-    // Use this for initialization
-    void Start () {
-
-    
-    }
-
-    
-	
+    List<IAssetObject> entities = new List<IAssetObject>();
+   
+   
 	// Update is called once per frame
 	void OnGUI () {
 		if(GUI.Button(new Rect(10,20,100,40),"Delete"))
@@ -31,10 +25,12 @@ public class Demo : MonoBehaviour
                 AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
             }
             string cube = "assets/r/res/cube.prefab";
+            AssetManager.Instance.LoadAsset<GameObject>(cube, cube, (assetObject) => {
 
-            AssetObject entity = new AssetObject();
-            entity.LoadAsset<GameObject>(cube, cube);
-            entities.Add(entity);
+                entities.Add(assetObject);
+
+            });
+           
         }
 
         if (GUI.Button(new Rect(10, 140, 100, 40), "Plane"))
@@ -45,9 +41,12 @@ public class Demo : MonoBehaviour
             }
             string plane = "assets/r/res/plane.prefab";
 
-            AssetObject entity = new AssetObject();
-            entity.LoadAsset<GameObject>(plane, plane);
-            entities.Add(entity);
+            AssetManager.Instance.LoadAsset<GameObject>(plane, plane, (assetObject) => {
+
+                entities.Add(assetObject);
+
+            });
+           
         }
 
         if (GUI.Button(new Rect(10, 200, 100, 40), "Scene"))

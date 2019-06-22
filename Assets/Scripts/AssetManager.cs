@@ -127,6 +127,107 @@ public class AssetManager : MonoBehaviour
         mLoadTask.Clear();
     }
 
+    public void LoadAsset<T>(string bundleName, string assetName, System.Action<AssetObject<T>> callback = null) where T : UnityEngine.Object
+    {
+        assetName = assetName.ToLower(); ;
+ 
+#if UNITY_EDITOR
+        if (assetMode == AssetMode.Editor)
+        {
+            AssetObject<T> assetObject = null;
+
+            var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
+
+            if (asset)
+            {
+                if (typeof(T) == typeof(GameObject))
+                {   
+                    if (callback != null)
+                    {
+                        var go = UnityEngine.Object.Instantiate(asset) as GameObject;
+
+                        go.transform.localPosition = Vector3.zero;
+                        go.transform.localRotation = Quaternion.identity;
+                        go.transform.localScale = Vector3.one;
+
+                        assetObject = new AssetObject<T>(assetName, null, asset, go as T);
+
+                        callback(assetObject);
+                    }
+                }
+                else
+                {
+                    if (callback != null)
+                    {
+                        assetObject = new AssetObject<T>(assetName, null, asset, null);
+                        callback(assetObject);
+                    }
+                }
+            }
+            else
+            {
+                if (callback != null)
+                {
+                    callback(assetObject);
+                }
+            }
+
+
+            return;
+        }
+#endif
+
+        Load(bundleName, (bundle) =>
+        {
+            if (bundle != null)
+            {
+                AssetObject<T> assetObject = null;
+               
+                var  asset = bundle.LoadAsset(assetName);
+                if (asset)
+                {
+                    if (typeof(T) == typeof(GameObject))
+                    {
+                        if (callback != null)
+                        {
+                            var go = UnityEngine.Object.Instantiate(asset) as GameObject;
+                            go.transform.localPosition = Vector3.zero;
+                            go.transform.localRotation = Quaternion.identity;
+                            go.transform.localScale = Vector3.one;
+
+                            assetObject = new AssetObject<T>(assetName, bundle, asset, go as T); 
+
+                            callback(assetObject);
+                        }
+                    }
+                    else
+                    {
+                        if (callback != null)
+                        {
+                            assetObject = new AssetObject<T>(assetName, bundle, asset, null);
+                            callback(assetObject);
+                        }
+                    }
+                }
+                else
+                {
+                    if (callback != null)
+                    {
+                        callback(assetObject);
+                    }
+                }
+            }
+            else
+            {
+                if (callback != null)
+                {
+                    callback(null);
+                }
+            }
+        });
+    }
+
+
     public void Load(string bundleName, Action<BundleObject> callback)
     {
         if (initialized == false)
