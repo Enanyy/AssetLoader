@@ -15,15 +15,15 @@ public class BundleObject
     //已经加载出来的asset
     private Dictionary<string, Object> mAssetDic = new Dictionary<string, Object>();
 
-    public BundleObject(string varAssetbundleName)
+    public BundleObject(string bundleName,string[] dependenceNames)
     {
         dependences = new Dictionary<string, BundleObject>();
         references = new Dictionary<string, List<IAssetObject>>();
-        bundleName = varAssetbundleName;
-        dependenceNames = AssetManager.Instance.GetAllDependencies(bundleName);
+        this.bundleName = bundleName;
+        this.dependenceNames = dependenceNames; 
     }
 
-    public void Load(System.Action<BundleObject> callback = null)
+    public void LoadSync(System.Action<BundleObject> callback = null)
     {
         if (dependenceNames != null)
         {
@@ -39,7 +39,7 @@ public class BundleObject
 
                     if (bundle.bundle == null)
                     {
-                        bundle.Load();
+                        bundle.LoadSync();
                     }
                 }
             }

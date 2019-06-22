@@ -183,7 +183,7 @@ public class AssetManager : MonoBehaviour
             {
                 AssetObject<T> assetObject = null;
                
-                var  asset = bundle.LoadAsset(assetName);
+                var asset = bundle.LoadAsset(assetName);
                 if (asset)
                 {
                     if (typeof(T) == typeof(GameObject))
@@ -244,7 +244,7 @@ public class AssetManager : MonoBehaviour
         {
             if (loadMode == LoadMode.Sync)
             {
-                bundle.Load(callback);
+                bundle.LoadSync(callback);
             }
             else if(loadMode== LoadMode.Async)
             {
@@ -275,12 +275,11 @@ public class AssetManager : MonoBehaviour
 
     public BundleObject CreateBundle(string bundleName)
     {
-        
         BundleObject bundle = GetBundle(bundleName);
 
         if(bundle == null)
         {
-            bundle = new BundleObject(bundleName);
+            bundle = new BundleObject(bundleName, GetAllDependencies(bundleName));
             mAssetBundleDic.Add(bundleName, bundle);
         }
         return bundle;
