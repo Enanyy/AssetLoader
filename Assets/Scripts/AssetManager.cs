@@ -36,6 +36,9 @@ public class AssetManager : MonoBehaviour
     }
     #endregion
 
+
+    private List<KeyValuePair<string, Action<BundleObject>>> mLoadTask = new List<KeyValuePair<string, Action<BundleObject>>>();
+
     private AssetBundle mManifestBundle;
     private AssetBundleManifest mManifest;
     private string mAssetBundlePath;
@@ -116,12 +119,20 @@ public class AssetManager : MonoBehaviour
         DontDestroyOnLoad(mManifest);
 
         initialized = true;
+
+        for(int i = 0; i < mLoadTask.Count; ++i)
+        {
+            Load(mLoadTask[i].Key, mLoadTask[i].Value);
+        }
+        mLoadTask.Clear();
     }
 
     public void Load(string bundleName, Action<BundleObject> callback)
     {
         if (initialized == false)
         {
+            mLoadTask.Add(new KeyValuePair<string, Action<BundleObject>>(bundleName, callback));
+
             return;
         }
         bundleName = bundleName.ToLower();

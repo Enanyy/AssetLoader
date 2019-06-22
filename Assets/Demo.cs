@@ -2,21 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Demo : MonoBehaviour {
-
-    private void Awake()
-    {
-        AssetManager.Instance.Init(LoadMode.Async,"StreamingAssets");
-    }
+public class Demo : MonoBehaviour
+{
     List<AssetObject> entities = new List<AssetObject>();
     // Use this for initialization
     void Start () {
 
-        Debug.Log(transform.forward);
-        Debug.Log(transform.rotation * Vector3.forward);
-
-        Debug.Log(transform.right);
-        Debug.Log(transform.rotation * Vector3.right);
+    
     }
 
     
@@ -34,6 +26,10 @@ public class Demo : MonoBehaviour {
 
         if (GUI.Button(new Rect(10, 80, 100, 40), "Cube"))
         {
+            if (AssetManager.Instance.initialized==false)
+            {
+                AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
+            }
             string cube = "assets/r/res/cube.prefab";
 
             AssetObject entity = new AssetObject();
@@ -43,6 +39,10 @@ public class Demo : MonoBehaviour {
 
         if (GUI.Button(new Rect(10, 140, 100, 40), "Plane"))
         {
+            if (AssetManager.Instance.initialized == false)
+            {
+                AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
+            }
             string plane = "assets/r/res/plane.prefab";
 
             AssetObject entity = new AssetObject();
@@ -52,6 +52,10 @@ public class Demo : MonoBehaviour {
 
         if (GUI.Button(new Rect(10, 200, 100, 40), "Scene"))
         {
+            if (AssetManager.Instance.initialized == false)
+            {
+                AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
+            }
             string level = "assets/r/scenes/test.level";
 
             AssetManager.Instance.Load(level, (bundle) => {
