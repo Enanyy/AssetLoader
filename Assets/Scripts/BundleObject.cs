@@ -23,7 +23,7 @@ public class BundleObject
         this.dependenceNames = dependenceNames; 
     }
 
-    public void LoadSync(System.Action<BundleObject> callback = null)
+    public void LoadSync(LoadTask<BundleObject> task = null)
     {
         if (dependenceNames != null)
         {
@@ -52,12 +52,12 @@ public class BundleObject
             Debug.LogError("Load assetbundle:" + bundleName + " failed!!");
         }
        
-        if (callback != null)
+        if (task!= null && task.callback != null)
         {
-            callback(this);
+            task.callback(this);
         }
     }
-    public IEnumerator LoadAsync(System.Action<BundleObject> callback = null)
+    public IEnumerator LoadAsync(LoadTask<BundleObject> task = null)
     {
         if (dependenceNames != null)
         {
@@ -93,13 +93,13 @@ public class BundleObject
         {
             Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
         }
-        if (callback != null)
+        if (task!= null && task.callback != null)
         {
-            callback(this);
+            task.callback(this);
         }
     }
 
-    public IEnumerator LoadWWW(System.Action<BundleObject> callback = null)
+    public IEnumerator LoadWWW(LoadTask<BundleObject> task = null)
     {
         if (dependenceNames != null)
         {
@@ -135,9 +135,9 @@ public class BundleObject
             {
                 Debug.LogError("Load assetbundle:" + bundleName + " failed from:" + bundleName + "!!");
             }
-            if (callback != null)
+            if (task!= null && task.callback != null)
             {
-                callback(this);
+                task.callback(this);
             }
         }
     }

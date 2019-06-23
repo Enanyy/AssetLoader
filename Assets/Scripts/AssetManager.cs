@@ -15,7 +15,25 @@ public enum AssetMode
     Editor,
     AssetBundle,
 }
+public class LoadTask<T>
+{
+    public string bundleName { get; private set; }
+    public string assetName { get; private set; }
+    public Action<T> callback { get; private set; }
 
+    public LoadTask(string bundleName,string assetName,Action<T> callback)
+    {
+        this.bundleName = bundleName;
+        this.assetName = assetName;
+        this.callback = callback;
+    }
+
+    public void Cancel()
+    {
+        callback = null;
+
+    }
+}
 public class AssetManager : MonoBehaviour
 {
 
@@ -37,7 +55,7 @@ public class AssetManager : MonoBehaviour
     #endregion
 
 
-    private List<KeyValuePair<string, Action<BundleObject>>> mLoadTask = new List<KeyValuePair<string, Action<BundleObject>>>();
+    private List<LoadTask<BundleObject>> mLoadTask = new List<LoadTask<BundleObject>>();
 
     private AssetBundle mManifestBundle;
     private AssetBundleManifest mManifest;
@@ -122,27 +140,27 @@ public class AssetManager : MonoBehaviour
 
         for(int i = 0; i < mLoadTask.Count; ++i)
         {
-            Load(mLoadTask[i].Key, mLoadTask[i].Value);
+            Load(mLoadTask[i].bundleName, mLoadTask[i].callback);
         }
         mLoadTask.Clear();
     }
 
-    public void LoadAsset<T>(string bundleName, string assetName, System.Action<AssetObject<T>> callback = null) where T : UnityEngine.Object
+    public LoadTask<AssetObject<T>> LoadAsset<T>(string bundleName, string assetName, System.Action<AssetObject<T>> callback = null) where T : UnityEngine.Object
     {
-        assetName = assetName.ToLower(); ;
+        LoadTask<AssetObject<T>> task = new LoadTask<AssetObject<T>>(bundleName.ToLower(), assetName.ToLower(), callback);
 
 #if UNITY_EDITOR
         if (assetMode == AssetMode.Editor)
         {
             AssetObject<T> assetObject = null;
 
-            var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetName);
+            var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(task.assetName);
 
             if (asset)
             {
                 if (typeof(T) == typeof(GameObject))
                 {
-                    if (callback != null)
+                    if (task.callback != null)
                     {
                         var go = UnityEngine.Object.Instantiate(asset) as GameObject;
 
@@ -150,87 +168,91 @@ public class AssetManager : MonoBehaviour
                         go.transform.localRotation = Quaternion.identity;
                         go.transform.localScale = Vector3.one;
 
-                        assetObject = new AssetObject<T>(assetName, null, asset, go as T);
+                        assetObject = new AssetObject<T>(task.assetName, null, asset, go as T);
 
-                        callback(assetObject);
+                        task.callback(assetObject);
                     }
                 }
                 else
                 {
-                    if (callback != null)
+                    if (task.callback != null)
                     {
-                        assetObject = new AssetObject<T>(assetName, null, asset, null);
-                        callback(assetObject);
+                        assetObject = new AssetObject<T>(task.assetName, null, asset, null);
+                        task.callback(assetObject);
                     }
                 }
             }
             else
             {
-                if (callback != null)
+                if (task.callback != null)
                 {
-                    callback(assetObject);
+                    task.callback(assetObject);
                 }
             }
-            return;
+            return task;
         }
 #endif
 
-        Load(bundleName, (bundle) =>
+        Load(task.bundleName, (bundle) =>
         {
             if (bundle != null)
             {
-                AssetObject<T> assetObject = bundle.LoadAsset<T>(assetName);
+                AssetObject<T> assetObject = bundle.LoadAsset<T>(task.assetName);
 
-                if (callback != null)
+                if (task.callback != null)
                 {
-                    callback(assetObject);
+                    task.callback(assetObject);
                 }
             }
             else
             {
-                if (callback != null)
+                if (task.callback != null)
                 {
-                    callback(null);
+                    task.callback(null);
                 }
             }
         });
+
+        return task;
     }
 
 
-    public void Load(string bundleName, Action<BundleObject> callback)
+    public LoadTask<BundleObject> Load(string bundleName, Action<BundleObject> callback)
     {
+        LoadTask<BundleObject> task = new LoadTask<BundleObject>(bundleName.ToLower(), null, callback);
+
         if (initialized == false)
         {
-            mLoadTask.Add(new KeyValuePair<string, Action<BundleObject>>(bundleName, callback));
+            mLoadTask.Add(task);
 
-            return;
+            return task;
         }
-        bundleName = bundleName.ToLower();
 
-        BundleObject bundle = CreateBundle(bundleName);
+        BundleObject bundle = CreateBundle(task.bundleName);
 
         if (bundle.bundle == null)
         {
             if (loadMode == LoadMode.Sync)
             {
-                bundle.LoadSync(callback);
+                bundle.LoadSync(task);
             }
             else if(loadMode== LoadMode.Async)
             {
-                StartCoroutine(bundle.LoadAsync(callback));
+                StartCoroutine(bundle.LoadAsync(task));
             }
             else if(loadMode == LoadMode.WWW)
             {
-                StartCoroutine(bundle.LoadWWW(callback));
+                StartCoroutine(bundle.LoadWWW(task));
             }
         }
         else
         {
-            if (callback != null)
+            if (task != null && task.callback != null)
             {
-                callback(bundle);
+                task.callback(bundle);
             }
         }
+        return task;
     }
 
     public BundleObject GetBundle(string bundleName)
