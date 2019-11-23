@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Assets version="0">
+  <asset name="cuberesource.prefab" path="assets/resources/cuberesource.prefab" size="2662" md5="cb2f2b80678eb98e8e0f37df2342b66a" />
+  <asset name="companylogo_ppay.png" path="assets/r/res/companylogo_ppay.png" size="187630" md5="457d6917a042a400c5fd39c92f285e83" />
+  <asset name="cube.mat" path="assets/r/res/cube.mat" size="2306" md5="ac952d3214b9dc731cc8894e9caba299" />
+  <asset name="cube.prefab" path="assets/r/res/cube.prefab" size="2510" md5="a46af106a1f7137c1ac6187e8088d1cd" />
+  <asset name="plane.mat" path="assets/r/res/plane.mat" size="2157" md5="dd219a9deaf05b7bc619a381367d4520" />
+  <asset name="plane.prefab" path="assets/r/res/plane.prefab" size="2861" md5="09b2fed13015062a6212a3511062534b" />
+  <asset name="testscene.unity" path="assets/r/scenes/testscene.unity" size="9971" md5="776b755bd22c9db1fc6a213a2ad6396a" />
+</Assets>

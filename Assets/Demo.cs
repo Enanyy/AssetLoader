@@ -1,73 +1,55 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Demo : MonoBehaviour
 {
-    List<IAssetObject> entities = new List<IAssetObject>();
-   
-   
-	// Update is called once per frame
-	void OnGUI () {
-		if(GUI.Button(new Rect(10,20,100,40),"Delete"))
+    public Scene mScene;
+    private void Start()
+    {
+        var task = AssetLoader.LoadScene("testscene.unity", LoadSceneMode.Additive, (scene, mode) =>
         {
-            if(entities.Count >0)
+            mScene = scene;
+
+        });
+        //task.Cancel();
+
+       
+        AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) =>
+        {
+
+            if (asset != null)
             {
-                entities[0].Destroy();
-                entities.RemoveAt(0);
+                Debug.Log("Load Success:cube.prefab!");
+                asset.Destroy();
             }
-        }
-
-        if (GUI.Button(new Rect(10, 80, 100, 40), "Cube"))
-        {
-            if (AssetManager.Instance.initialized==false)
+            else
             {
-                AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
+                Debug.Log("Load Failed:cube.prefab!");
+
             }
-            string cube = "assets/r/res/cube.prefab";
-            AssetManager.Instance.LoadAsset<GameObject>(cube, cube, (assetObject) => {
 
-                entities.Add(assetObject);
+        });
 
-            });
-           
-        }
 
-        if (GUI.Button(new Rect(10, 140, 100, 40), "Plane"))
+
+        AssetLoader.LoadAsset<GameObject>("CubeResource.prefab", (asset) =>
         {
-            if (AssetManager.Instance.initialized == false)
+
+            if (asset != null)
             {
-                AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
+                Debug.Log("Load Success:CubeResource.prefab!");
             }
-            string plane = "assets/r/res/plane.prefab";
-
-            AssetManager.Instance.LoadAsset<GameObject>(plane, plane, (assetObject) => {
-
-                entities.Add(assetObject);
-
-            });
-           
-        }
-
-        if (GUI.Button(new Rect(10, 200, 100, 40), "Scene"))
-        {
-            if (AssetManager.Instance.initialized == false)
+            else
             {
-                AssetManager.Instance.Init(LoadMode.Async, "StreamingAssets");
+                Debug.Log("Load Failed:CubeResource.prefab!");
+
             }
-            string level = "assets/r/scenes/test.level";
 
-            AssetManager.Instance.Load(level, (bundle) => {
-                if(bundle!=null && bundle.bundle)
-                {
-                    UnityEngine.SceneManagement.SceneManager.LoadScene("test");
-                }
-            });
-        }
+        });
+        //task.Cancel();
 
-        if (GUI.Button(new Rect(10, 260, 100, 40), "Destroy"))
-        {
-            AssetManager.Instance.Destroy();
-        }
     }
+
 }
