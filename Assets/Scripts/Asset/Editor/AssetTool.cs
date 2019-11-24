@@ -216,7 +216,7 @@ public static class AssetTool
                     var group = EditorGUILayout.DelayedTextField(asset.group, GUILayout.ExpandWidth(true));
                     if ( select == false ||  group != asset.group)
                     {
-                        Debug.Log(check + "," + select + "," + asset.group + "," + group);
+                        //Debug.Log(check + "," + select + "," + asset.group + "," + group);
                         SetAssetsGroup(editor.targets, group);
                         SaveAssetList();
                     }
@@ -342,10 +342,10 @@ public static class AssetTool
 
         string md5 = bytes != null ? MD5Hash.Get(bytes) : "";
 
-        AssetFile asset = AssetPath.Get(name);
+        AssetFile asset = list.Get(name);
         if (asset == null)
         {
-            asset = AssetPath.Get(md5);
+            asset = list.Get(md5);
         }
         if(asset!= null)
         {
@@ -368,7 +368,7 @@ public static class AssetTool
     [MenuItem("Tools/Asset/生成资源配置")]
     static void GenerateAssetList()
     {
-        AssetPath.Clear();
+        list.Clear();
         var it = s_AssetDirs.GetEnumerator();
         while (it.MoveNext())
         {
@@ -407,9 +407,9 @@ public static class AssetTool
                 path = fullPath.Substring(fullPath.IndexOf("assets/")).ToLower();
             }
 
-            AssetFile asset = AssetPath.Get(name);
-            if (asset == null) asset = AssetPath.Get(path);
-            if (asset == null) asset = AssetPath.Get(md5);
+            AssetFile asset = list.Get(name);
+            if (asset == null) asset = list.Get(path);
+            if (asset == null) asset = list.Get(md5);
             if (asset == null)
             {
                 asset = new AssetFile();

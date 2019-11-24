@@ -129,6 +129,12 @@ public class AssetList
         return assets.ContainsKey(key);
     }
 
+    public AssetFile Get(string key)
+    {
+        assets.TryGetValue(key, out AssetFile file);
+        return file;
+    }
+
     public void FromXml(string xml)
     {
         try
@@ -212,7 +218,7 @@ public class AssetList
 public static class AssetPath
 {
 
-    public static AssetList list = new AssetList();
+    public readonly static AssetList list = new AssetList();
   
     public static AssetMode mode 
     {
@@ -342,9 +348,9 @@ public static class AssetPath
 
     public static AssetFile Get(string key)
     {
-        AssetFile asset;
-        list.assets.TryGetValue(key, out asset);
-        return asset;
+        AssetFile file = list.Get(key);
+       
+        return file;
     }
 
     public static string GetFullPath(string path)
