@@ -64,13 +64,18 @@
         
 - **3.菜单说明**       
     Tools/Asset/Mode/Editor： 切换为Editor开发模式，直接从AssetDatabase加载资源。
+    
     Tools/Asset/Mode/AssetBundle： 切换为AssetBundle模式，需要打包AssetBundle。
+    
     Tools/Asset/生成资源配置：自动生成指定目录（s_AssetDirs配置的）下的所有资源到assets.txt
+    
     Tools/Asset/保存资源配置：保存当前勾选了的资源到assets.txt
+    
     Tools/Asset/Build：打包当前平台的AssetBunlde
     
         
-## 其他说明
-  勾选了资源后会在Assets/目录下生成一个assets.txt的资源列表文件，保存了当前勾选了的资源和设置的Bundle名。
-  打包AssetBundle后也会在生成的根目录生成一个assets.txt的资源列表文件，包括Resources和Bundle资源。
+  ## 其他说明
+    勾选了资源后会在Assets/目录下生成一个assets.txt的资源列表文件，保存了当前勾选了的资源和设置的Bundle名。
+    
+    打包AssetBundle后也会在生成的根目录生成一个assets.txt的资源列表文件，包括Resources和Bundle资源。
    
