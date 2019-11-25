@@ -3,7 +3,7 @@
   <asset name="cuberesource.prefab" asset="assets/resources/cuberesource.prefab" md5="19102" />
   <asset name="companylogo_ppay.png" asset="assets/r/res/companylogo_ppay.png" md5="18786" />
   <asset name="cube.mat" asset="assets/r/res/cube.mat" md5="18808" />
-  <asset name="cube.prefab" asset="assets/r/res/cube.prefab" md5="19222" />
+  <asset name="cube.prefab" asset="assets/r/res/cube.prefab" bundle="res" md5="19222" />
   <asset name="plane.mat" asset="assets/r/res/plane.mat" md5="18782" />
   <asset name="plane.prefab" asset="assets/r/res/plane.prefab" md5="19376" />
   <asset name="testscene.unity" asset="assets/r/scenes/testscene.unity" md5="18834" />
