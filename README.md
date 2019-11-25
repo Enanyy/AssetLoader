@@ -53,6 +53,7 @@
 
             }
         });
+        //task.isCancel = true;//取消加载
                
 - **2.加载和卸载场景**
         
@@ -61,6 +62,7 @@
             AssetLoader.UnloadScene(scene, null); //卸载场景
 
         });
+        //task.isCancel = true;//取消加载
         
 - **3.菜单说明**       
     Tools/Asset/Mode/Editor： 切换为Editor开发模式，直接从AssetDatabase加载资源。
