@@ -29,6 +29,7 @@
     /// <summary>
     /// 指定目录可以选中(小写字符串)
     /// </summary>
+    
     static List<string> s_AssetDirs = new List<string>
     {
         { "assets/resources/"},
