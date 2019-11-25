@@ -26,10 +26,7 @@
   
   可以设置指定目录可以勾选，在AssetTool.cs内添加指定目录：
   
-    /// <summary>
-    /// 指定目录可以选中(小写字符串)
-    /// </summary>
-    
+
     static List<string> s_AssetDirs = new List<string>
     {
         { "assets/resources/"},
