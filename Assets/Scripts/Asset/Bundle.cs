@@ -571,7 +571,7 @@ public class BundleScene : Bundle
             }
             else
             {
-                AssetLoader.UnLoadScene(scene, null);
+                AssetLoader.UnloadScene(scene, null);
             }
         }
     }

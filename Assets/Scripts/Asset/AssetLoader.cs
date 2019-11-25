@@ -20,7 +20,7 @@ public class AssetLoader : MonoBehaviour
     /// <param name="key"></param>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public static AssetLoadTask<T> LoadAsset<T>(string key, Action<Asset<T>> callback) where T : UnityEngine.Object
+    public static IAssetLoadTask<T> LoadAsset<T>(string key, Action<Asset<T>> callback) where T : UnityEngine.Object
     {
         AssetLoadTask<T> task = new AssetLoadTask<T>(key.ToLower(), callback);
 
@@ -44,13 +44,28 @@ public class AssetLoader : MonoBehaviour
     }
 
     /// <summary>
+    /// 实例化GameObject
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static Asset<GameObject> Instantiate(Asset<GameObject> source)
+    {
+        if(source == null || source.bundle== null)
+        {
+            return null;
+        }
+        Asset<GameObject> asset = new Asset<GameObject>(source.assetName, source.bundle, source.asset, UnityEngine.Object.Instantiate(source.assetObject));
+        return asset;
+    }
+
+    /// <summary>
     /// 加载场景
     /// </summary>
     /// <param name="key"></param>
     /// <param name="mode"></param>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public static SceneLoadTask LoadScene(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback)
+    public static ISceneLoadTask LoadScene(string key, LoadSceneMode mode, Action<Scene, LoadSceneMode> callback)
     {
         SceneLoadTask task = new SceneLoadTask(key.ToLower(), mode, callback);
         LoadScene(task);
@@ -75,7 +90,7 @@ public class AssetLoader : MonoBehaviour
     /// </summary>
     /// <param name="scene"></param>
     /// <param name="callback"></param>
-    public static void UnLoadScene(Scene scene, Action callback)
+    public static void UnloadScene(Scene scene, Action callback)
     {
         Instance.StartCoroutine(Instance.UnloadSceneAsync(scene, callback));
     }

@@ -17,10 +17,25 @@ public enum AssetMode
 /// </summary>
 public class AssetFile
 {
+    /// <summary>
+    /// 资源key
+    /// </summary>
     public string name;
-    public string group;
-    public string path;
+    /// <summary>
+    /// 资源所在的bundle
+    /// </summary>
+    public string bundle;
+    /// <summary>
+    /// 资源名（单独打包也是bundle名）
+    /// </summary>
+    public string asset;
+    /// <summary>
+    /// bundle大小
+    /// </summary>
     public long size;
+    /// <summary>
+    /// bundle的md5,Editor下是资源的InstanceID
+    /// </summary>
     public string md5;
 
     public void ToXml(XmlNode parent)
@@ -38,15 +53,24 @@ public class AssetFile
         parent.AppendChild(node);
 
         AddAttribute(doc, node, "name", name);
-        if (string.IsNullOrEmpty(group) == false)
+
+        if (string.IsNullOrEmpty(asset) == false)
         {
-            AddAttribute(doc, node, "group", group);
+            AddAttribute(doc, node, "asset", asset);
         }
 
-        AddAttribute(doc, node, "path", path);
-        AddAttribute(doc, node, "size", size.ToString());
-        AddAttribute(doc, node, "md5", md5);
-
+        if (string.IsNullOrEmpty(bundle) == false)
+        {
+            AddAttribute(doc, node, "bundle", bundle);
+        }
+        if (size > 0)
+        {
+            AddAttribute(doc, node, "size", size.ToString());
+        }
+        if (string.IsNullOrEmpty(md5) == false)
+        {
+            AddAttribute(doc, node, "md5", md5);
+        }
     }
     private void AddAttribute(XmlDocument doc, XmlElement node, string name, string value)
     {
@@ -58,11 +82,10 @@ public class AssetFile
     public void FromXml(XmlElement element)
     {
         name = element.GetAttribute("name");
-        group = element.GetAttribute("group");
-        path = element.GetAttribute("path");
-        size = long.Parse(element.GetAttribute("size"));
+        bundle = element.GetAttribute("bundle");
+        asset = element.GetAttribute("asset");
+        long.TryParse(element.GetAttribute("size"), out size);
         md5 = element.GetAttribute("md5");
-
     }
 }
 /// <summary>
@@ -80,8 +103,6 @@ public class AssetList
         {
             return;
         }
-        asset.name = asset.name.ToLower();
-        asset.path = asset.path.ToLower();
         if (assets.ContainsKey(asset.name) == false)
         {
             assets.Add(asset.name, asset);
@@ -91,13 +112,13 @@ public class AssetList
             assets[asset.name] = asset;
         }
 
-        if (assets.ContainsKey(asset.path) == false)
+        if (assets.ContainsKey(asset.asset) == false)
         {
-            assets.Add(asset.path, asset);
+            assets.Add(asset.asset, asset);
         }
         else
         {
-            assets[asset.path] = asset;
+            assets[asset.asset] = asset;
         }
 #if UNITY_EDITOR
         if (assets.ContainsKey(asset.md5) == false)
@@ -118,7 +139,7 @@ public class AssetList
             return;
         }
         assets.Remove(asset.name);
-        assets.Remove(asset.path);
+        assets.Remove(asset.asset);
 #if UNITY_EDITOR
         assets.Remove(asset.md5);
 #endif
@@ -146,8 +167,7 @@ public class AssetList
             XmlElement root = doc.DocumentElement;
 
             manifest = root.GetAttribute("manifest");
-            version = int.Parse(root.GetAttribute("version"));
-
+            int.TryParse(root.GetAttribute("version"), out version);
             assets.Clear();
 
             for (int i = 0; i < root.ChildNodes.Count; ++i)

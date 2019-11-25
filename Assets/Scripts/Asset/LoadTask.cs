@@ -11,7 +11,7 @@ public interface ILoadTask
 {
     string bundleName { get; }
     string assetName { get; }
-    bool isCancel { get; }
+    bool isCancel { get; set; }
 }
 public abstract class LoadTask : ILoadTask
 {
@@ -23,7 +23,7 @@ public abstract class LoadTask : ILoadTask
         {
             if (path != null)
             {
-                return string.IsNullOrEmpty(path.group) ? path.path : path.group;
+                return string.IsNullOrEmpty(path.bundle) ? path.asset : path.bundle;
             }
             return key;
         }
@@ -43,7 +43,7 @@ public abstract class LoadTask : ILoadTask
             {
                 if (path != null)
                 {
-                    return path.path;
+                    return path.asset;
                 }
                 return key;
             }
@@ -69,10 +69,6 @@ public abstract class LoadTask : ILoadTask
 
     }
     public bool isCancel { get; set; }
-    public void Cancel()
-    {
-        isCancel = true;
-    }
 }
 
 public interface ISceneLoadTask:ILoadTask
