@@ -17,6 +17,7 @@
   
   ## 使用
 - **1.加载和卸载资源**
+      
         var task = AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) =>
         {
             if (asset != null)
