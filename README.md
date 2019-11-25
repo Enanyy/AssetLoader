@@ -24,6 +24,8 @@
   勾选Bundle并设置Bundle名称，表示该资源会合并打包进相应的Bundle内，如果不勾选和设置，则会单独打Bundle，路径则为资源以Assets/开始的相对路径。
   注意：Resources目录下的资源如果没有设置Bundle名称时不会打出AssetBunlde的。
   
+  ![](doc/img.png)
+  
   可以设置指定目录可以勾选，在AssetTool.cs内添加指定目录：
   
 
