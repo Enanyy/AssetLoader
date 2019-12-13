@@ -198,7 +198,7 @@ public class AssetLoader : MonoBehaviour
         }
         else if (mStatus == LoadStatus.Loading)
         {
-            yield return new WaitUntil(() => mStatus == LoadStatus.Done);
+            yield return new WaitUntil(() => mStatus >= LoadStatus.Done);
         }
         else
         {

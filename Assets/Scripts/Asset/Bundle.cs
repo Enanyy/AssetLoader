@@ -28,7 +28,7 @@ public class Bundle
         }
         else if (status == LoadStatus.Loading)
         {
-            yield return new WaitUntil(() => status == LoadStatus.Done);
+            yield return new WaitUntil(() => status >= LoadStatus.Done);
         }
         else
         {
@@ -236,7 +236,7 @@ public class BundleAsset:Bundle
                     }
                     else
                     {
-                        yield return new WaitUntil(() => status == LoadStatus.Done || task.isCancel);
+                        yield return new WaitUntil(() => status >= LoadStatus.Done || task.isCancel);
                     }
                 }
 

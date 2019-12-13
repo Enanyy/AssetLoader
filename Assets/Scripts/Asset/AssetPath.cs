@@ -265,7 +265,7 @@ public static class AssetPath
         }
         else if (status == LoadStatus.Loading)
         {
-            yield return new WaitUntil(() => status == LoadStatus.Done);
+            yield return new WaitUntil(() => status >= LoadStatus.Done);
         }
         else
         {
