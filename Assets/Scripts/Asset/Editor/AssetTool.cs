@@ -102,8 +102,8 @@ public static class AssetTool
     }
 
     static GUIStyle s_ToggleMixed;
-
-
+  
+    
 
     static bool IsValid(string assetPath)
     {
@@ -581,7 +581,7 @@ public static class AssetTool
 
         SaveBuildList(outputPath);
 
-        Debug.Log("Build Success!");
+        Debug.Log("Build Success! Output:" + outputPath);
     }
 
     static void SaveBuildList(string outputPath)

@@ -8,21 +8,21 @@ public class Demo : MonoBehaviour
     public Scene mScene;
     private void Start()
     {
-        var task = AssetLoader.LoadScene("testscene.unity", LoadSceneMode.Additive, (scene, mode) =>
+        var sceneTask = AssetLoader.LoadScene("testscene.unity", LoadSceneMode.Additive, (scene, mode) =>
         {
             mScene = scene;
 
         });
-        //task.Cancel();
+        sceneTask.isCancel = true; //取消加载
 
        
-        AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) =>
+        var cubeTask = AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) =>
         {
 
             if (asset != null)
             {
                 Debug.Log("Load Success:cube.prefab!");
-                asset.Destroy();
+                asset.Destroy(); //销毁
             }
             else
             {
@@ -32,9 +32,23 @@ public class Demo : MonoBehaviour
 
         });
 
+        var cubeTas1= AssetLoader.LoadAsset<GameObject>("cube.prefab", (asset) =>
+        {
 
+            if (asset != null)
+            {
+                Debug.Log("Load Success:cube.prefab!");
+            }
+            else
+            {
+                Debug.Log("Load Failed:cube.prefab!");
+            }
 
-        AssetLoader.LoadAsset<GameObject>("CubeResource.prefab", (asset) =>
+        });
+
+        //cubeTas1.isCancel = true;
+
+        var cubeResourceTask = AssetLoader.LoadAsset<GameObject>("CubeResource.prefab", (asset) =>
         {
 
             if (asset != null)
@@ -48,7 +62,7 @@ public class Demo : MonoBehaviour
             }
 
         });
-        //task.Cancel();
+        cubeResourceTask.isCancel = true;
 
     }
 
