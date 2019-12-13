@@ -105,6 +105,10 @@ public class AssetLoader : MonoBehaviour
 
     public static T GetOrCreateBundle<T>(string bundleName) where T:Bundle,new ()
     {
+        if(string.IsNullOrEmpty(bundleName))
+        {
+            return null;
+        }
         T bundle = GetBundle<T>(bundleName);
        
         if(bundle == null)
@@ -202,16 +206,24 @@ public class AssetLoader : MonoBehaviour
             //初始化资源列表
             yield return AssetPath.Initialize();
 
+           
+
             if (AssetPath.mode == AssetMode.AssetBundle)
             {
-                BundleAsset bundle = GetOrCreateBundle<BundleAsset>(AssetPath.list.manifest);
+                if (string.IsNullOrEmpty(AssetPath.list.manifest))
+                {
+                    Debug.LogError("AssetPath.list.manifest is null !!!");
+                }
+                else
+                {
+                    BundleAsset bundle = GetOrCreateBundle<BundleAsset>(AssetPath.list.manifest);
 
-                AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
+                    AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
 
-                task.assetName = "AssetBundleManifest";
+                    task.assetName = "AssetBundleManifest";
 
-                yield return bundle.LoadAssetAsync(task);
-
+                    yield return bundle.LoadAssetAsync(task);
+                }
             }
             else
             {
