@@ -328,13 +328,20 @@ public static class AssetPath
             return string.Format("{0}/../r/StandaloneWindows/", Application.dataPath);
         }
 #elif UNITY_STANDALONE_OSX
+        if (IntPtr.Size == 8) //64 bit
+        {
             return string.Format("{0}/../r/StandaloneOSX/", Application.dataPath);
+        }
+        else  //32 bit
+        {
+            return string.Format("{0}/../r/StandaloneOSXUniversal/", Application.dataPath);
+        }
 #else
         return path;
 #endif
 #endif
 
-        }
+    }
 
     private static string mStreamingAssetsPath;
     /// <summary>
