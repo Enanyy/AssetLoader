@@ -35,10 +35,24 @@ public class AssetLoader : MonoBehaviour
     /// <param name="task"></param>
     public static void LoadAsset<T>(IAssetLoadTask<T> task) where T : UnityEngine.Object
     {
-        if (task == null)
+        if (task == null )
         {
+            Debug.LogError("The param task can't be null!");
             return;
         }
+
+        if(string.IsNullOrEmpty(task.bundleName))
+        {
+            Debug.LogError("BundlName can't be null!");
+            return;
+        }
+
+        if(string.IsNullOrEmpty(task.assetName))
+        {
+            Debug.LogError("AssetName can't be null!");
+            return;
+        }
+
 
         Instance.StartCoroutine(Instance.LoadAssetAsync(task));
     }
@@ -79,8 +93,22 @@ public class AssetLoader : MonoBehaviour
     {
         if (task == null)
         {
+            Debug.LogError("The param task can't be null!");
             return;
         }
+
+        if (string.IsNullOrEmpty(task.bundleName))
+        {
+            Debug.LogError("BundlName can't be null!");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(task.sceneName))
+        {
+            Debug.LogError("SceneName can't be null!");
+            return;
+        }
+
         Instance.StartCoroutine(Instance.LoadSceneAsync(task));
     }
   
@@ -107,6 +135,7 @@ public class AssetLoader : MonoBehaviour
     {
         if(string.IsNullOrEmpty(bundleName))
         {
+            Debug.LogError("The bundleName is null!");
             return null;
         }
         T bundle = GetBundle<T>(bundleName);
