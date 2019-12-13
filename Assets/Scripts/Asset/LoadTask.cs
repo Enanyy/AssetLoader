@@ -6,6 +6,7 @@ public enum LoadStatus
     None,
     Loading,
     Done,
+    Error,
 }
 public interface ILoadTask
 {

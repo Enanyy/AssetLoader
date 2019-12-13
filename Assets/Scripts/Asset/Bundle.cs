@@ -49,6 +49,7 @@ public class Bundle
                 }
                 else
                 {
+                    status = LoadStatus.Error;
                     Debug.Log("Can't Load AssetBundle:" + bundleName + "  from :" + path + "!!");
                 }
             }

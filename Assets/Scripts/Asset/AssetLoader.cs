@@ -206,28 +206,34 @@ public class AssetLoader : MonoBehaviour
             //初始化资源列表
             yield return AssetPath.Initialize();
 
-           
-
-            if (AssetPath.mode == AssetMode.AssetBundle)
+            if (AssetPath.status == LoadStatus.Done)
             {
-                if (string.IsNullOrEmpty(AssetPath.list.manifest))
+                if (AssetPath.mode == AssetMode.AssetBundle)
                 {
-                    Debug.LogError("AssetPath.list.manifest is null !!!");
+                    if (string.IsNullOrEmpty(AssetPath.list.manifest))
+                    {
+                        mStatus = LoadStatus.Error;
+                        Debug.LogError("AssetPath.list.manifest is null !!!");
+                    }
+                    else
+                    {
+                        BundleAsset bundle = GetOrCreateBundle<BundleAsset>(AssetPath.list.manifest);
+
+                        AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
+
+                        task.assetName = "AssetBundleManifest";
+
+                        yield return bundle.LoadAssetAsync(task);
+                    }
                 }
                 else
                 {
-                    BundleAsset bundle = GetOrCreateBundle<BundleAsset>(AssetPath.list.manifest);
-
-                    AssetLoadTask<AssetBundleManifest> task = new AssetLoadTask<AssetBundleManifest>(AssetPath.list.manifest, FinishInitialize);
-
-                    task.assetName = "AssetBundleManifest";
-
-                    yield return bundle.LoadAssetAsync(task);
+                    FinishInitialize(null);
                 }
             }
             else
             {
-                FinishInitialize(null);
+                mStatus = LoadStatus.Error;
             }
         }
     }

@@ -290,6 +290,11 @@ public static class AssetPath
 
                     status = LoadStatus.Done;
                 }
+                else
+                {
+                    status = LoadStatus.Error;
+                    Debug.LogError(request.error);
+                }
             }
         }
     }
