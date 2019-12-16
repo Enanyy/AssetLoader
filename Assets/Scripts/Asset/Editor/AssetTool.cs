@@ -28,7 +28,7 @@ public static class AssetTool
   
         EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
         EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-        if (EditorApplication.isPlayingOrWillChangePlaymode==false)
+        if (EditorApplication.isPlayingOrWillChangePlaymode == false)
         {
             LoadAssetList();
         }
@@ -45,7 +45,14 @@ public static class AssetTool
         }
         else if(state == PlayModeStateChange.ExitingEditMode)
         {
-            SaveAssetList();
+            if (File.Exists(ASSETSFILE))
+            {
+                SaveAssetList();
+            }
+            else
+            {
+                GenerateAssetList();
+            }
 
             UpdateBuildSettingScene(true);
         }
@@ -60,7 +67,7 @@ public static class AssetTool
         }
         else
         {
-            SaveAssetList();
+            GenerateAssetList();
         }
     }
 
@@ -371,7 +378,7 @@ public static class AssetTool
     }
 
     [MenuItem("Tools/Asset/生成资源配置")]
-    static void GenerateAssetList()
+    public static void GenerateAssetList()
     {
         list.Clear();
         var it = s_AssetDirs.GetEnumerator();
