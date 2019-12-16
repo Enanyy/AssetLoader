@@ -405,7 +405,7 @@ public static class AssetPath
 
         if (path.Contains(resources))
         {
-            path = path.Substring(path.LastIndexOf(resources) + resources.Length);
+            path = path.Substring(path.LastIndexOf(resources, StringComparison.Ordinal) + resources.Length);
 
             if (path.Contains("."))
             {

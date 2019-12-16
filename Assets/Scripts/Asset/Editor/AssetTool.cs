@@ -71,7 +71,7 @@ public static class AssetTool
        while (it.MoveNext())
        {
            string path = it.Current.Value.asset;
-           if (path.EndsWith(".unity"))
+           if (path.EndsWith(".unity", System.StringComparison.Ordinal))
            {
                var scene = GetScene(scenes, path);
                if (scene == null && add)
@@ -108,7 +108,7 @@ public static class AssetTool
     static bool IsValid(string assetPath)
     {
         if (string.IsNullOrEmpty(assetPath)
-            || assetPath.EndsWith(".cs"))
+            || assetPath.EndsWith(".cs", System.StringComparison.Ordinal))
         {
             return false;
         }
@@ -117,7 +117,7 @@ public static class AssetTool
             var it = s_AssetDirs.GetEnumerator();
             while (it.MoveNext())
             {
-                if (assetPath.StartsWith(it.Current))
+                if (assetPath.StartsWith(it.Current, System.StringComparison.Ordinal))
                 {
                     return true;
                 }
@@ -220,7 +220,7 @@ public static class AssetTool
                     if (isSelectAsset == false)
                     {
                         string dir = Path.GetDirectoryName(asset.asset);
-                        asset.bundle = dir.Substring(dir.LastIndexOf("\\") + 1);
+                        asset.bundle = dir.Substring(dir.LastIndexOf("\\", System.StringComparison.Ordinal) + 1);
                     }
 
                     var group = EditorGUILayout.DelayedTextField(asset.bundle, GUILayout.ExpandWidth(true));
@@ -396,8 +396,8 @@ public static class AssetTool
         for (int i = 0; i < files.Length; ++i)
         {
             string file = files[i].Replace("\\","/").ToLower();
-            if (file.EndsWith(".meta")
-            || file.EndsWith(".manifest"))
+            if (file.EndsWith(".meta", System.StringComparison.Ordinal)
+            || file.EndsWith(".manifest", System.StringComparison.Ordinal))
             {
                 continue;
             }
@@ -407,7 +407,7 @@ public static class AssetTool
            
             if (file.Contains("assets/"))
             {
-                assetPath = file.Substring(file.IndexOf("assets/"));
+                assetPath = file.Substring(file.IndexOf("assets/", System.StringComparison.Ordinal));
             }
             Object target = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
             string md5 = target.GetInstanceID().ToString();
@@ -455,8 +455,8 @@ public static class AssetTool
         {
             string path = files[i];
 
-            if (path.EndsWith(".cs")
-                || path.EndsWith(".meta")
+            if (path.EndsWith(".cs", System.StringComparison.Ordinal)
+                || path.EndsWith(".meta", System.StringComparison.Ordinal)
             )
             {
                 continue;
@@ -498,7 +498,7 @@ public static class AssetTool
                 //Resources目录设置了bundle才打bundle
                 if (file.asset.Contains("resources/") == false || string.IsNullOrEmpty(file.bundle) == false)
                 {
-                    if (file.asset.EndsWith(".unity"))
+                    if (file.asset.EndsWith(".unity", System.StringComparison.Ordinal))
                     {
                         scenes.Add(file.asset);                       
                     }
